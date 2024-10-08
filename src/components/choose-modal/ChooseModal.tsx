@@ -6,7 +6,6 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  getKeyValue,
   Input,
   Table,
   TableBody,
@@ -15,11 +14,13 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ArrowBackIcon } from './ArrowBackIcon'
 import { CreateNewFolderIcon } from './CreateNewFolderIcon'
 import { createFolder, getDirectoryItems } from 'api/components/choose-modal'
 import { toast } from 'sonner'
+import { formatDistance } from 'date-fns'
+import { filesize } from 'filesize'
 
 interface Props {
   currentDirectory: string
@@ -34,6 +35,11 @@ interface Directory {
   type: 'file' | 'folder'
   size: string
   lastModified: string
+}
+
+interface NewFolderNameModalProps {
+  isFolderNameModalOpen: boolean
+  handleClose: () => void
 }
 
 const columns = [
@@ -61,7 +67,6 @@ const ChooseModal: React.FC<Props> = ({
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const [isSaveable, setIsSaveable] = useState(false)
   const [directory, setDirectory] = useState(currentDirectory)
-  // let prevDirectory = currentDirectory
   const [prevDirectory, setPrevDirectory] = useState(currentDirectory)
   const [items, setItems] = useState<Directory[]>([])
   const [isFolderNameModalOpen, setIsFolderNameModalOpen] = useState(false)
@@ -134,10 +139,6 @@ const ChooseModal: React.FC<Props> = ({
     setIsFolderNameModalOpen(false)
   }
 
-  interface NewFolderNameModalProps {
-    isFolderNameModalOpen: boolean
-    handleClose: () => void
-  }
   const NewFolderNameModal: React.FC<NewFolderNameModalProps> = ({
     isFolderNameModalOpen,
     handleClose
@@ -197,6 +198,19 @@ const ChooseModal: React.FC<Props> = ({
   }
 
   const ChooseModalContent = () => {
+    const renderCell = useCallback((item: Directory, columnKey: string) => {
+      const cellValue = item[columnKey as keyof Directory]
+      switch (columnKey) {
+        case 'lastModified':
+          return formatDistance(new Date(cellValue), new Date(), {
+            addSuffix: true
+          })
+        case 'size':
+          return cellValue === '-' ? '-' : filesize(cellValue)
+        default:
+          return cellValue
+      }
+    }, [])
     return (
       <div className="flex flex-col gap-4">
         <div className="flex justify-between gap-1">
@@ -248,7 +262,8 @@ const ChooseModal: React.FC<Props> = ({
             {(item) => (
               <TableRow key={item.name}>
                 {(columnKey) => (
-                  <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+                  // <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+                  <TableCell>{renderCell(item, String(columnKey))}</TableCell>
                 )}
               </TableRow>
             )}
@@ -264,7 +279,6 @@ const ChooseModal: React.FC<Props> = ({
       onOpenChange={onOpenChange}
       onClose={handleClose}
       size="2xl"
-      classNames={{}}
     >
       <ModalContent>
         {(onClose) => (
