@@ -1,6 +1,8 @@
 import { Button, Input, Select, SelectItem } from '@nextui-org/react'
+import { createProject } from 'api/pages/new'
 import ChooseModal from 'components/choose-modal/ChooseModal'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 const dockingPrograms = [
   { key: 'vina', label: 'AutoDock Vina' },
@@ -27,8 +29,13 @@ export const New = () => {
   const [workingDirectory, setWorkingDirectory] = useState(
     '/Users/di/Projects/test/'
   )
-  const [fragmentsFile, setFragmentsFile] = useState('/Users/di/Projects/test/')
-  const [targetFile, setTargetFile] = useState('/Users/di/Projects/test/')
+  const [fragmentsFile, setFragmentsFile] = useState(
+    '/Users/di/Projects/test/demo_1020.smi'
+  )
+  const [targetFile, setTargetFile] = useState(
+    '/Users/di/Projects/test/PHGDH_6RJ3_for_vina.pdbqt'
+  )
+  const [projectName, setProjectName] = useState('')
   const [isWorkingDirectoryModalOpen, setIsWorkingDirectoryModalOpen] =
     useState(false)
   const [isFragmentsFileModalOpen, setIsFragmentsFileModalOpen] =
@@ -54,6 +61,20 @@ export const New = () => {
 
   const handleTargetFileSave = (directory: string) => {
     setTargetFile(directory)
+  }
+
+  const handleCreateProject = () => {
+    createProject(workingDirectory, fragmentsFile, targetFile, projectName)
+      .then((res) => {
+        toast.success(res.data.message)
+      })
+      .catch((e) => {
+        if (e.status === 400) {
+          toast.error(e.response.data.error)
+        } else {
+          toast.error(e.message)
+        }
+      })
   }
 
   return (
@@ -144,8 +165,16 @@ export const New = () => {
               </div>
               <div className="sm:col-span-6">
                 <div className="flex w-full flex-wrap items-center gap-4 md:flex-nowrap">
-                  <Input type="text" label="Project Name" isRequired></Input>
-                  <Button color="primary">Create</Button>
+                  <Input
+                    type="text"
+                    label="Project Name"
+                    value={projectName}
+                    onValueChange={setProjectName}
+                    isRequired
+                  ></Input>
+                  <Button color="primary" onPress={handleCreateProject}>
+                    Create
+                  </Button>
                 </div>
               </div>
             </div>

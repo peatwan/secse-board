@@ -111,7 +111,6 @@ const ChooseModal: React.FC<Props> = ({
         setItems(res.data)
       })
       .catch((e) => {
-        console.log(e)
         if (e.status === 400) {
           toast.error(e.response.data.error)
         } else {

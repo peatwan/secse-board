@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, request
 import os
 from datetime import datetime
+from loguru import logger
+from loguru._defaults import LOGURU_FORMAT
+import shutil
+from utils.config import Config
 
 app = Flask(__name__)
 
@@ -86,5 +90,71 @@ def create_folder():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Create a new project
+@app.route('/secse/create_project', methods=['POST'])
+def create_project():
+  # Get args from request data
+    workdir = request.json.get('workdir')
+    fragments = request.json.get('fragments')
+    target = request.json.get('target')
+    project_code = request.json.get('project_code')
+
+     # Validate args are provided
+    if not workdir or not fragments or not target or not project_code:
+        return jsonify({"error": "Workdir, fragments, target and project_code must be provided"}), 400
+
+    # Validate directory or file exist
+    if not os.path.exists(workdir):
+        return jsonify({"error": "Workdir does not exist"}), 400
+    if not os.path.exists(fragments) or not os.path.isfile(fragments):
+        return jsonify({"error": "Fragments file does not exist"}), 400
+    if not os.path.exists(target) or not os.path.isfile(target):
+        return jsonify({"error": "Target file does not exist"}), 400
+
+    # Construct the full path for the new project
+    new_project_path = os.path.join(workdir, project_code)
+
+    # Check if the folder already exists
+    if os.path.exists(new_project_path):
+        return jsonify({"error": "Project already exists, please choose another name"}), 400
+
+     # Try to create the project
+    try:
+        os.makedirs(new_project_path)
+         # Path of the file to be copied
+        source_config_file = "./data/config.ini"
+        # Copy the file to the new_project_path
+        shutil.copy(source_config_file, new_project_path)
+        logger.info(f"Config file has been copied to {new_project_path}")
+
+        # loading config file
+        config_file_path=os.path.join(new_project_path, 'config.ini')
+        config = Config(config_file_path)
+        logger.info("Config file loaded")
+
+        # Set values and save to file
+        config.set_value("DEFAULT", "project_code", project_code)
+        config.set_value("DEFAULT","workdir",workdir)
+        config.set_value("DEFAULT","fragments",fragments)
+        config.set_value("docking","target",fragments)
+        config.save()
+
+        return jsonify({"message": "Peoject created successfully", "project name": project_code}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
+  # logger configuration
+    logger.configure(
+        handlers=[
+            {
+                "sink": "logs/app_{time:YYYYMMDD}.log",
+                "rotation": "00:00",
+                "encoding": "utf-8",
+                "format": LOGURU_FORMAT,
+                "level": "INFO",
+            }
+        ],
+    )
+
     app.run(debug=True)
