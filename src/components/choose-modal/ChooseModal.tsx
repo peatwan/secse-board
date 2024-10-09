@@ -236,8 +236,7 @@ const ChooseModal: React.FC<Props> = ({
           selectionMode="multiple"
           selectionBehavior="replace"
           classNames={{
-            base: 'max-h-[520px]',
-            table: 'min-h-[220px]'
+            base: 'max-h-[450px]'
           }}
           onRowAction={(key) => {
             const selectedItem = items.find((item) => item.name === key)
@@ -278,6 +277,9 @@ const ChooseModal: React.FC<Props> = ({
       onOpenChange={onOpenChange}
       onClose={handleClose}
       size="2xl"
+      classNames={{
+        body: 'min-h-[520px] max-h-[520px]'
+      }}
     >
       <ModalContent>
         {(onClose) => (
