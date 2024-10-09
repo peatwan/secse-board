@@ -10,10 +10,20 @@ export const createProject = (
     method: 'post',
     url: '/secse/create_project',
     data: {
-      workdir: workingDirectory,
-      fragments: fragmentsFile,
-      target: targetFile,
-      project_code: projectName
+      workingDirectory: workingDirectory,
+      fragmentsFile: fragmentsFile,
+      targetFile: targetFile,
+      projectName: projectName
+    }
+  })
+}
+
+export const getConfig = (directory: string) => {
+  return axios({
+    method: 'get',
+    url: '/secse/get_config',
+    params: {
+      directory: directory
     }
   })
 }
