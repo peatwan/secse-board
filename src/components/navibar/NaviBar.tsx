@@ -20,7 +20,9 @@ export const NaviBar = () => {
       <NavbarContent className="hidden gap-10 sm:flex" justify="start">
         <NavbarItem isActive={location.pathname === '/new'}>
           <Link
-            color={location.pathname === '/new' ? 'primary' : 'foreground'}
+            color={
+              location.pathname.startsWith('/new') ? 'primary' : 'foreground'
+            }
             href="/new"
           >
             New

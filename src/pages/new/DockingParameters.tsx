@@ -1,11 +1,4 @@
-import { Input, Select, SelectItem } from '@nextui-org/react'
-
-const dockingPrograms = [
-  { key: 'vina', label: 'AutoDock Vina' },
-  { key: 'glide', label: 'Glide' },
-  { key: 'autodock-gPU', label: 'Autodock-GPU' },
-  { key: 'unidock', label: 'Uni-Dock' }
-]
+import { Input } from '@nextui-org/react'
 
 function DockingParameters() {
   return (
@@ -14,14 +7,6 @@ function DockingParameters() {
         Docking Parameters
       </span>
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-        <div className="sm:col-span-4">
-          <Select label="Docking Programs" isRequired>
-            {dockingPrograms.map((item) => (
-              <SelectItem key={item.key}>{item.label}</SelectItem>
-            ))}
-          </Select>
-        </div>
-
         <div className="gap-3 sm:col-span-6">
           <span className="text-lg font-medium leading-7 text-gray-900 ">
             Docking Box

@@ -1,3 +1,10 @@
+export enum PredictionMode {
+  NOT_USE,
+  MODELING_PER_GENERATION,
+  MODELING_ON_ALL_GENERATION
+}
+export type DockingProgram = 'vina' | 'glide' | 'autodock-gpu' | 'unidock'
+
 export interface DefaultConfig {
   projectCode: string
   workdir: string
@@ -6,7 +13,7 @@ export interface DefaultConfig {
   numPerGen: string
   seedPerGen: string
   startGen: string
-  dockingProgram: string
+  dockingProgram: DockingProgram
   cpu: string
   gpu: string
   ruleDb: string
@@ -26,7 +33,7 @@ export interface DockingConfig {
 }
 
 export interface PredictionConfig {
-  mode: string
+  mode: PredictionMode
   dlPerGen: string
   dlScoreCutoff: string
 }

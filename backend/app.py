@@ -203,6 +203,13 @@ def get_config():
         return jsonify({"error": str(e)}), 500
 
 
+# Get default directory
+@app.route("/secse/get_default_directory", methods=["GET"])
+def get_default_directory():
+    home_dir = os.path.expanduser("~/Projects/test/")
+    return jsonify(home_dir), 200
+
+
 if __name__ == "__main__":
     # logger configuration
     logger.configure(

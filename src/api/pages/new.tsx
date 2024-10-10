@@ -27,3 +27,10 @@ export const getConfig = (directory: string) => {
     }
   })
 }
+
+export const getDefaultDirectory = () => {
+  return axios({
+    method: 'get',
+    url: '/secse/get_default_directory'
+  })
+}
