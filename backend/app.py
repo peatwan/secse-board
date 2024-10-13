@@ -4,8 +4,12 @@ from datetime import datetime
 from loguru import logger
 from loguru._defaults import LOGURU_FORMAT
 import shutil
-from utils.strutil import convert_dict_to_camel_case
+from utils.strutil import (
+    convert_dict_from_snake_to_camel_case,
+    convert_dict_from_camel_to_snake_case,
+)
 from utils.config import Config
+import json
 
 app = Flask(__name__)
 
@@ -178,7 +182,7 @@ def create_project():
         return jsonify({"error": str(e)}), 500
 
 
-# Create a new project
+# Get config
 @app.route("/secse/get_config", methods=["GET"])
 def get_config():
     # Get directory path from request arguments
@@ -195,8 +199,38 @@ def get_config():
             "prediction": config.get_all_options("prediction"),
             "molecular_properties": config.get_all_options("molecular_properties"),
         }
-        app_config_camel = convert_dict_to_camel_case(app_config)
+        app_config_camel = convert_dict_from_snake_to_camel_case(app_config)
         return jsonify(app_config_camel), 200
+
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"error": str(e)}), 500
+
+
+# Save config
+@app.route("/secse/save_config", methods=["POST"])
+def save_config():
+    # Get directory path from request arguments
+    directory = request.json.get("directory")
+    # Get config from request arguments
+    configDict = request.json.get("config")
+
+    configDict = convert_dict_from_camel_to_snake_case(configDict)
+
+    config_file = os.path.join(directory, "config.ini")
+    try:
+        config = Config(config_file)
+        config.set_all_options("default_config", configDict["default_config"])
+        config.set_all_options("docking", configDict["docking"])
+        config.set_all_options("prediction", configDict["prediction"])
+        config.set_all_options(
+            "molecular_properties", configDict["molecular_properties"]
+        )
+        config.save()
+        return (
+            jsonify({"message": "Paramters Saved successfully"}),
+            200,
+        )
 
     except Exception as e:
         logger.error(e)

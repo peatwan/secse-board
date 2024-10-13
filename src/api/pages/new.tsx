@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { AppConfig } from 'pages/new/types/appConfig'
 
 export const createProject = (
   workingDirectory: string,
@@ -24,6 +25,17 @@ export const getConfig = (directory: string) => {
     url: '/secse/get_config',
     params: {
       directory: directory
+    }
+  })
+}
+
+export const saveConfig = (directory: string, appConfig: AppConfig) => {
+  return axios({
+    method: 'post',
+    url: '/secse/save_config',
+    data: {
+      directory: directory,
+      config: appConfig
     }
   })
 }

@@ -4,7 +4,7 @@ import DockingParameters from './DockingParameters'
 import MolecularProperties from './MolecularProperties'
 import PredictionParameters from './PredictionParameters'
 import { useEffect, useState } from 'react'
-import { getConfig } from 'api/pages/new'
+import { getConfig, saveConfig } from 'api/pages/new'
 import { toast } from 'sonner'
 import { AppConfig } from './types/appConfig'
 import { useProjectStore } from 'utils/store'
@@ -35,6 +35,13 @@ const Param = () => {
 
   const handleSave = () => {
     console.log(appConfig)
+    saveConfig(path, appConfig)
+      .then((res) => {
+        toast.success(res.data.message)
+      })
+      .catch((e) => {
+        toast.error(e.message)
+      })
   }
 
   const handleReset = () => {

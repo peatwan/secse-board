@@ -21,7 +21,7 @@ export interface DefaultConfig {
 
 export interface DockingConfig {
   target: string
-  RMSD: string
+  rmsd: string
   deltaScore: string
   scoreCutoff: string
   x?: string
@@ -39,19 +39,19 @@ export interface PredictionConfig {
 }
 
 export interface MolecularPropertiesConfig {
-  MW: string
-  logPLower: string
-  logPUpper: string
+  mw: string
+  logpLower: string
+  logpUpper: string
   chiralCenter: string
   heteroatomRatio: string
   rdkitRotatableBoundNum: string
   keenRotatableBoundNum: string
   rigidBodyNum: string
-  HBD: string
-  HBA: string
-  TPSA: string
+  hbd: string
+  hba: string
+  tpsa: string
   lipinskiViolation: string
-  QED: string
+  qed: string
   maxRingSize: string
   maxRingSystemSize: string
   ringSystemCount: string

@@ -112,8 +112,8 @@ const DockingParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="RMSE Threshold (Å)"
-            value={dockingConfig.RMSD}
-            onValueChange={(value) => handleUpdate('docking.RMSD', value)}
+            value={dockingConfig.rmsd}
+            onValueChange={(value) => handleUpdate('docking.rmsd', value)}
           />
         </div>
         <div className="sm:col-span-2">

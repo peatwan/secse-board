@@ -77,7 +77,6 @@ class Config:
     def __init__(self, config_file: str):
         self.config_file = config_file
         self.config_parser = configparser.ConfigParser()
-        self.config_parser.optionxform = str
         try:
             read_files = self.config_parser.read(config_file)
             if not read_files:

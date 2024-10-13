@@ -31,7 +31,7 @@ export class AppConfigImpl implements AppConfig {
 
     this.docking = {
       target: config?.docking?.target || '',
-      rmd: config?.docking?.rmd || '',
+      rmsd: config?.docking?.rmsd || '',
       deltaScore: config?.docking?.deltaScore || '',
       scoreCutoff: config?.docking?.scoreCutoff || '',
       x: config?.docking?.x || '',
@@ -49,9 +49,9 @@ export class AppConfigImpl implements AppConfig {
     }
 
     this.molecularProperties = {
-      MW: config?.molecularProperties?.MW || '',
-      logPLower: config?.molecularProperties?.logPLower || '',
-      logPUpper: config?.molecularProperties?.logPUpper || '',
+      mw: config?.molecularProperties?.mw || '',
+      logpLower: config?.molecularProperties?.logpLower || '',
+      logpUpper: config?.molecularProperties?.logpUpper || '',
       chiralCenter: config?.molecularProperties?.chiralCenter || '',
       heteroatomRatio: config?.molecularProperties?.heteroatomRatio || '',
       rdkitRotatableBoundNum:
@@ -59,11 +59,11 @@ export class AppConfigImpl implements AppConfig {
       keenRotatableBoundNum:
         config?.molecularProperties?.keenRotatableBoundNum || '',
       rigidBodyNum: config?.molecularProperties?.rigidBodyNum || '',
-      HBD: config?.molecularProperties?.HBD || '',
-      HBA: config?.molecularProperties?.HBA || '',
-      TPSA: config?.molecularProperties?.TPSA || '',
+      hbd: config?.molecularProperties?.hbd || '',
+      hba: config?.molecularProperties?.hba || '',
+      tpsa: config?.molecularProperties?.tpsa || '',
       lipinskiViolation: config?.molecularProperties?.lipinskiViolation || '',
-      QED: config?.molecularProperties?.QED || '',
+      qed: config?.molecularProperties?.qed || '',
       maxRingSize: config?.molecularProperties?.maxRingSize || '',
       maxRingSystemSize: config?.molecularProperties?.maxRingSystemSize || '',
       ringSystemCount: config?.molecularProperties?.ringSystemCount || '',
