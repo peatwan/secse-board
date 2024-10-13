@@ -68,7 +68,10 @@ const Param = () => {
               />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
-              <DockingParameters />
+              <DockingParameters
+                dockingConfig={appConfig.docking}
+                handleUpdate={handleUpdate}
+              />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
               <MolecularProperties />

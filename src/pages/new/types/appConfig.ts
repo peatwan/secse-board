@@ -21,7 +21,7 @@ export interface DefaultConfig {
 
 export interface DockingConfig {
   target: string
-  rmd: string
+  RMSD: string
   deltaScore: string
   scoreCutoff: string
   x?: string

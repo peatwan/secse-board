@@ -1,6 +1,7 @@
 import { Input, Select, SelectItem } from '@nextui-org/react'
-import { DefaultConfig } from './types/appConfig'
+import { DefaultConfig, DockingProgram } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
+import { useProjectStore } from 'utils/store'
 
 interface Props {
   defaultConfig: DefaultConfig
@@ -18,6 +19,8 @@ const DefaultParameters: React.FC<Props> = ({
   defaultConfig,
   handleUpdate
 }) => {
+  const { setDockingProgram } = useProjectStore()
+
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
@@ -134,7 +137,14 @@ const DefaultParameters: React.FC<Props> = ({
             label="Docking Program"
             selectedKeys={[defaultConfig.dockingProgram]}
             onSelectionChange={(keys) => {
-              handleUpdate('defaultConfig.dockingProgram', keys.currentKey)
+              const value = keys.currentKey
+              handleUpdate(
+                'defaultConfig.dockingProgram',
+                value ? value : 'vina'
+              )
+              setDockingProgram(
+                value ? (value as DockingProgram) : ('vina' as DockingProgram)
+              )
             }}
           >
             {dockingPrograms.map((item) => (

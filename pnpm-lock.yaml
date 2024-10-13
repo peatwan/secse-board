@@ -32,6 +32,9 @@ importers:
       react-router-dom:
         specifier: ^6.26.2
         version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-smooth-collapse:
+        specifier: ^2.1.2
+        version: 2.1.2(react@18.3.1)
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2975,6 +2978,11 @@ packages:
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
+
+  react-smooth-collapse@2.1.2:
+    resolution: {integrity: sha512-Wq3NUBisI7Gycj4z7GVGTQyI2bfZSJ1UTSZNzGC3H3hysdRW+uHve3TJyQDFd6gDaXljPQy3u8zNuXZ8NzuptQ==}
+    peerDependencies:
+      react: ^16.3.0 || ^17.0.0 || ^18.0.0
 
   react-style-singleton@2.2.1:
     resolution: {integrity: sha512-ZWj0fHEMyWkHzKYUr2Bs/4zU6XLmq9HsgBURm7g5pAVfyn49DgUiNgY2d4lXRlYSiCif9YBGpQleewkcqddc7g==}
@@ -7320,6 +7328,12 @@ snapshots:
   react-router@6.26.2(react@18.3.1):
     dependencies:
       '@remix-run/router': 1.19.2
+      react: 18.3.1
+
+  react-smooth-collapse@2.1.2(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.25.6
+      prop-types: 15.8.1
       react: 18.3.1
 
   react-style-singleton@2.2.1(@types/react@18.3.5)(react@18.3.1):
