@@ -160,9 +160,9 @@ def create_project():
         logger.info("Config file loaded")
 
         # Set values and save to file
-        config.set_value("default_config", "project_code", project_code)
-        config.set_value("default_config", "workdir", new_project_path)
-        config.set_value("default_config", "fragments", fragments)
+        config.set_value("general", "project_code", project_code)
+        config.set_value("general", "workdir", new_project_path)
+        config.set_value("general", "fragments", fragments)
         config.set_value("docking", "target", fragments)
 
         # Save changes to the configuration file
@@ -178,6 +178,8 @@ def create_project():
             201,
         )
     except Exception as e:
+        # remove directory if fail to create
+        shutil.rmtree(new_project_path)
         logger.error(e)
         return jsonify({"error": str(e)}), 500
 
@@ -194,10 +196,10 @@ def get_config():
     try:
         config = Config(config_file)
         app_config = {
-            "default_config": config.get_all_options("default_config"),
+            "general": config.get_all_options("general"),
             "docking": config.get_all_options("docking"),
             "prediction": config.get_all_options("prediction"),
-            "molecular_properties": config.get_all_options("molecular_properties"),
+            "properties": config.get_all_options("properties"),
         }
         app_config_camel = convert_dict_from_snake_to_camel_case(app_config)
         return jsonify(app_config_camel), 200
@@ -221,12 +223,10 @@ def save_config():
     config_file = os.path.join(directory, "config.ini")
     try:
         config = Config(config_file)
-        config.set_all_options("default_config", configDict["default_config"])
+        config.set_all_options("general", configDict["general"])
         config.set_all_options("docking", configDict["docking"])
         config.set_all_options("prediction", configDict["prediction"])
-        config.set_all_options(
-            "molecular_properties", configDict["molecular_properties"]
-        )
+        config.set_all_options("properties", configDict["properties"])
         config.save()
         return (
             jsonify({"message": "Parameters saved successfully"}),

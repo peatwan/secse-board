@@ -3,7 +3,6 @@ from configparser import NoSectionError, NoOptionError
 from dataclasses import dataclass
 from loguru import logger
 from typing import Dict, Optional
-import os
 
 
 class ConfigError(Exception):
@@ -13,7 +12,7 @@ class ConfigError(Exception):
 
 
 @dataclass
-class DefaultConfig:
+class General:
     project_code: str
     workdir: str
     fragments: str
@@ -21,14 +20,14 @@ class DefaultConfig:
     num_per_gen: int
     seed_per_gen: int
     start_gen: int
-    docking_program: str
     cpu: int
     gpu: int
     rule_db: str
 
 
 @dataclass
-class DockingConfig:
+class Docking:
+    docking_program: str
     target: str
     RMSD: float
     delta_score: float
@@ -42,14 +41,14 @@ class DockingConfig:
 
 
 @dataclass
-class PredictionConfig:
+class Prediction:
     mode: int
     dl_per_gen: int
     dl_score_cutoff: float
 
 
 @dataclass
-class MolecularPropertiesConfig:
+class Properties:
     MW: float
     logP_lower: float
     logP_upper: float
@@ -98,39 +97,32 @@ class Config:
                     f"Configuration file '{config_file}' not found or is empty."
                 )
 
-            # DEFAULT_CONFIG
-            if self.config_parser.has_section("default_config"):
-                self.default_config = DefaultConfig(
-                    project_code=self.config_parser.get(
-                        "default_config", "project_code"
-                    ),
-                    workdir=self.config_parser.get("default_config", "workdir"),
-                    fragments=self.config_parser.get("default_config", "fragments"),
-                    num_gen=self.config_parser.getint("default_config", "num_gen"),
-                    num_per_gen=self.config_parser.getint(
-                        "default_config", "num_per_gen"
-                    ),
-                    seed_per_gen=self.config_parser.getint(
-                        "default_config", "seed_per_gen"
-                    ),
-                    start_gen=self.config_parser.getint("default_config", "start_gen"),
-                    docking_program=self.config_parser.get(
-                        "default_config", "docking_program"
-                    ),
-                    cpu=self.config_parser.getint("default_config", "cpu"),
-                    gpu=self.config_parser.getint("default_config", "gpu"),
-                    rule_db=self.config_parser.get("default_config", "rule_db"),
+            # general
+            if self.config_parser.has_section("general"):
+                self.general = General(
+                    project_code=self.config_parser.get("general", "project_code"),
+                    workdir=self.config_parser.get("general", "workdir"),
+                    fragments=self.config_parser.get("general", "fragments"),
+                    num_gen=self.config_parser.getint("general", "num_gen"),
+                    num_per_gen=self.config_parser.getint("general", "num_per_gen"),
+                    seed_per_gen=self.config_parser.getint("general", "seed_per_gen"),
+                    start_gen=self.config_parser.getint("general", "start_gen"),
+                    cpu=self.config_parser.getint("general", "cpu"),
+                    gpu=self.config_parser.getint("general", "gpu"),
+                    rule_db=self.config_parser.get("general", "rule_db"),
                 )
-
-            # DOCKING
+            # docking
             if self.config_parser.has_section("docking"):
-                docking = DockingConfig(
+                docking = Docking(
+                    docking_program=self.config_parser.get(
+                        "docking", "docking_program"
+                    ),
                     target=self.config_parser.get("docking", "target"),
                     RMSD=self.config_parser.getfloat("docking", "RMSD"),
                     delta_score=self.config_parser.getfloat("docking", "delta_score"),
                     score_cutoff=self.config_parser.getfloat("docking", "score_cutoff"),
                 )
-                if "vina" in self.default_config.docking_program.lower():
+                if "vina" in docking.docking_program.lower():
                     docking.x = self.config_parser.getfloat("docking", "x")
                     docking.y = self.config_parser.getfloat("docking", "y")
                     docking.z = self.config_parser.getfloat("docking", "z")
@@ -147,9 +139,9 @@ class Config:
             else:
                 self.docking = None
 
-            # PREDICTION
+            # prediction
             if self.config_parser.has_section("prediction"):
-                self.prediction = PredictionConfig(
+                self.prediction = Prediction(
                     mode=self.config_parser.getint("prediction", "mode"),
                     dl_per_gen=self.config_parser.getint("prediction", "dl_per_gen"),
                     dl_score_cutoff=self.config_parser.getfloat(
@@ -159,65 +151,61 @@ class Config:
             else:
                 self.prediction = None
 
-            # MOLECULAR_PROPERTIES
-            if self.config_parser.has_section("molecular_properties"):
-                self.molecular_properties = MolecularPropertiesConfig(
-                    MW=self.config_parser.getfloat("molecular_properties", "MW"),
-                    logP_lower=self.config_parser.getfloat(
-                        "molecular_properties", "logP_lower"
-                    ),
-                    logP_upper=self.config_parser.getfloat(
-                        "molecular_properties", "logP_upper"
-                    ),
+            # properties
+            if self.config_parser.has_section("properties"):
+                self.properties = Properties(
+                    MW=self.config_parser.getfloat("properties", "MW"),
+                    logP_lower=self.config_parser.getfloat("properties", "logP_lower"),
+                    logP_upper=self.config_parser.getfloat("properties", "logP_upper"),
                     chiral_center=self.config_parser.getint(
-                        "molecular_properties", "chiral_center"
+                        "properties", "chiral_center"
                     ),
                     heteroatom_ratio=self.config_parser.getfloat(
-                        "molecular_properties", "heteroatom_ratio"
+                        "properties", "heteroatom_ratio"
                     ),
                     rdkit_rotatable_bound_num=self.config_parser.getint(
-                        "molecular_properties", "rdkit_rotatable_bound_num"
+                        "properties", "rdkit_rotatable_bound_num"
                     ),
                     keen_rotatable_bound_num=self.config_parser.getint(
-                        "molecular_properties", "keen_rotatable_bound_num"
+                        "properties", "keen_rotatable_bound_num"
                     ),
                     rigid_body_num=self.config_parser.getint(
-                        "molecular_properties", "rigid_body_num"
+                        "properties", "rigid_body_num"
                     ),
-                    HBD=self.config_parser.getint("molecular_properties", "HBD"),
-                    HBA=self.config_parser.getint("molecular_properties", "HBA"),
-                    TPSA=self.config_parser.getfloat("molecular_properties", "TPSA"),
+                    HBD=self.config_parser.getint("properties", "HBD"),
+                    HBA=self.config_parser.getint("properties", "HBA"),
+                    TPSA=self.config_parser.getfloat("properties", "TPSA"),
                     lipinski_violation=self.config_parser.getint(
-                        "molecular_properties", "lipinski_violation"
+                        "properties", "lipinski_violation"
                     ),
-                    QED=self.config_parser.getfloat("molecular_properties", "QED"),
+                    QED=self.config_parser.getfloat("properties", "QED"),
                     max_ring_size=self.config_parser.getint(
-                        "molecular_properties", "max_ring_size"
+                        "properties", "max_ring_size"
                     ),
                     max_ring_system_size=self.config_parser.getint(
-                        "molecular_properties", "max_ring_system_size"
+                        "properties", "max_ring_system_size"
                     ),
                     ring_system_count=self.config_parser.getint(
-                        "molecular_properties", "ring_system_count"
+                        "properties", "ring_system_count"
                     ),
                     bridged_site_count=self.config_parser.getint(
-                        "molecular_properties", "bridged_site_count"
+                        "properties", "bridged_site_count"
                     ),
                     spiro_site_count=self.config_parser.getint(
-                        "molecular_properties", "spiro_site_count"
+                        "properties", "spiro_site_count"
                     ),
                     fused_site_count=self.config_parser.getint(
-                        "molecular_properties", "fused_site_count"
+                        "properties", "fused_site_count"
                     ),
                     rdkit_sa_score=self.config_parser.getint(
-                        "molecular_properties", "rdkit_sa_score"
+                        "properties", "rdkit_sa_score"
                     ),
                     substructure_filter=self.config_parser.getint(
-                        "molecular_properties", "substructure_filter"
+                        "properties", "substructure_filter"
                     ),
                 )
             else:
-                self.molecular_properties = None
+                self.properties = None
 
         except (NoSectionError, NoOptionError, ValueError, configparser.Error) as e:
             logger.error(f"Configuration parsing error: {e}")
@@ -338,8 +326,8 @@ class Config:
                 logger.info(f"Set '{option}' in section '{section}' to '{value}'")
 
                 # Update corresponding dataclass if applicable
-                if section == "default_config" and hasattr(self.default_config, option):
-                    set_attribute(self.default_config, option, value)
+                if section == "general" and hasattr(self.general, option):
+                    set_attribute(self.general, option, value)
                 elif (
                     section == "docking"
                     and self.docking
@@ -353,11 +341,11 @@ class Config:
                 ):
                     set_attribute(self.prediction, option, value)
                 elif (
-                    section == "molecular_properties"
-                    and self.molecular_properties
-                    and hasattr(self.molecular_properties, option)
+                    section == "properties"
+                    and self.properties
+                    and hasattr(self.properties, option)
                 ):
-                    set_attribute(self.molecular_properties, option, value)
+                    set_attribute(self.properties, option, value)
 
         except Exception as e:
             logger.error(f"Error setting multiple options in section '{section}': {e}")

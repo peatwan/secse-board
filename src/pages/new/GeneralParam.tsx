@@ -1,26 +1,13 @@
-import { Input, Select, SelectItem } from '@nextui-org/react'
-import { DefaultConfig, DockingProgram } from './types/appConfig'
+import { Input } from '@nextui-org/react'
+import { General } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
-import { useProjectStore } from 'utils/store'
 
 interface Props {
-  defaultConfig: DefaultConfig
+  general: General
   handleUpdate: <V>(path: AppConfigPaths, value: V) => void
 }
 
-const dockingPrograms = [
-  { key: 'vina', label: 'AutoDock Vina' },
-  { key: 'glide', label: 'Glide' },
-  { key: 'autodock-gpu', label: 'Autodock-GPU' },
-  { key: 'unidock', label: 'Uni-Dock' }
-]
-
-const DefaultParameters: React.FC<Props> = ({
-  defaultConfig,
-  handleUpdate
-}) => {
-  const { setDockingProgram } = useProjectStore()
-
+const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
@@ -32,7 +19,7 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Project Name"
-            value={defaultConfig.projectCode}
+            value={general.projectCode}
             isReadOnly
             size="lg"
           />
@@ -42,7 +29,7 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Project Path"
-            value={defaultConfig.workdir}
+            value={general.workdir}
             isReadOnly
           />
         </div>
@@ -51,7 +38,7 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Fragments"
-            value={defaultConfig.fragments}
+            value={general.fragments}
             isReadOnly
           />
         </div>
@@ -60,9 +47,9 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Number of Generations"
-            value={defaultConfig.numGen}
+            value={general.numGen}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.numGen', value)
+              handleUpdate('general.numGen', value)
             }}
           />
         </div>
@@ -71,9 +58,9 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Number per Generations"
-            value={defaultConfig.numPerGen}
+            value={general.numPerGen}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.numPerGen', value)
+              handleUpdate('general.numPerGen', value)
             }}
           />
         </div>
@@ -82,9 +69,9 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Seeds per Generations"
-            value={defaultConfig.seedPerGen}
+            value={general.seedPerGen}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.seedPerGen', value)
+              handleUpdate('general.seedPerGen', value)
             }}
           />
         </div>
@@ -93,9 +80,9 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Starting Generation"
-            value={defaultConfig.startGen}
+            value={general.startGen}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.startGen', value)
+              handleUpdate('general.startGen', value)
             }}
           />
         </div>
@@ -104,9 +91,9 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="CPUs"
-            value={defaultConfig.cpu}
+            value={general.cpu}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.cpu', value)
+              handleUpdate('general.cpu', value)
             }}
           />
         </div>
@@ -115,9 +102,9 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="GPUs"
-            value={defaultConfig.gpu}
+            value={general.gpu}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.gpu', value)
+              handleUpdate('general.gpu', value)
             }}
           />
         </div>
@@ -126,35 +113,15 @@ const DefaultParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Customized Rule DB"
-            value={defaultConfig.ruleDb}
+            value={general.ruleDb}
             onValueChange={(value) => {
-              handleUpdate('defaultConfig.ruleDb', value)
+              handleUpdate('general.ruleDb', value)
             }}
           />
-        </div>
-        <div className="sm:col-span-2">
-          <Select
-            label="Docking Program"
-            selectedKeys={[defaultConfig.dockingProgram]}
-            onSelectionChange={(keys) => {
-              const value = keys.currentKey
-              handleUpdate(
-                'defaultConfig.dockingProgram',
-                value ? value : 'vina'
-              )
-              setDockingProgram(
-                value ? (value as DockingProgram) : ('vina' as DockingProgram)
-              )
-            }}
-          >
-            {dockingPrograms.map((item) => (
-              <SelectItem key={item.key}>{item.label}</SelectItem>
-            ))}
-          </Select>
         </div>
       </div>
     </div>
   )
 }
 
-export default DefaultParameters
+export default GeneralParam

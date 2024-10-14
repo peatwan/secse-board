@@ -5,7 +5,7 @@ export enum PredictionMode {
 }
 export type DockingProgram = 'vina' | 'glide' | 'autodock-gpu' | 'unidock'
 
-export interface DefaultConfig {
+export interface General {
   projectCode: string
   workdir: string
   fragments: string
@@ -13,13 +13,13 @@ export interface DefaultConfig {
   numPerGen: string
   seedPerGen: string
   startGen: string
-  dockingProgram: DockingProgram
   cpu: string
   gpu: string
   ruleDb: string
 }
 
-export interface DockingConfig {
+export interface Docking {
+  dockingProgram: DockingProgram
   target: string
   rmsd: string
   deltaScore: string
@@ -32,13 +32,13 @@ export interface DockingConfig {
   boxSizeZ?: string
 }
 
-export interface PredictionConfig {
+export interface Prediction {
   mode: PredictionMode
   dlPerGen: string
   dlScoreCutoff: string
 }
 
-export interface MolecularPropertiesConfig {
+export interface Properties {
   mw: string
   logpLower: string
   logpUpper: string
@@ -63,8 +63,8 @@ export interface MolecularPropertiesConfig {
 }
 
 export interface AppConfig {
-  defaultConfig: DefaultConfig
-  docking: DockingConfig
-  prediction: PredictionConfig
-  molecularProperties: MolecularPropertiesConfig
+  general: General
+  docking: Docking
+  prediction: Prediction
+  properties: Properties
 }

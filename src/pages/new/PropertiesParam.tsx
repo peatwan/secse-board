@@ -1,6 +1,6 @@
 import { Input } from '@nextui-org/react'
 
-function MolecularProperties() {
+function PropertiesParam() {
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
@@ -53,4 +53,4 @@ function MolecularProperties() {
   )
 }
 
-export default MolecularProperties
+export default PropertiesParam

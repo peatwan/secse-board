@@ -9,10 +9,10 @@ import {
   ModalHeader,
   useDisclosure
 } from '@nextui-org/react'
-import DefaultParameters from './DefaultParameters'
-import DockingParameters from './DockingParameters'
-import MolecularProperties from './MolecularProperties'
-import PredictionParameters from './PredictionParameters'
+import GeneralParam from './GeneralParam'
+import DockingParam from './DockingParam'
+import PropertiesParam from './PropertiesParam'
+import PredictionParam from './PredictionParam'
 import { useEffect, useState } from 'react'
 import { getConfig, saveConfig } from 'api/pages/new'
 import { toast } from 'sonner'
@@ -85,22 +85,22 @@ const Param = () => {
 
           <div className="space-y-12 ">
             <div className="border-b border-gray-900/10 pb-10">
-              <DefaultParameters
-                defaultConfig={appConfig.defaultConfig}
+              <GeneralParam
+                general={appConfig.general}
                 handleUpdate={handleUpdate}
               />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
-              <DockingParameters
-                dockingConfig={appConfig.docking}
+              <DockingParam
+                docking={appConfig.docking}
                 handleUpdate={handleUpdate}
               />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
-              <MolecularProperties />
+              <PropertiesParam />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
-              <PredictionParameters />
+              <PredictionParam />
             </div>
           </div>
 

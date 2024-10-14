@@ -1,35 +1,34 @@
 import {
   AppConfig,
-  DefaultConfig,
-  DockingConfig,
-  MolecularPropertiesConfig,
-  PredictionConfig,
+  General,
+  Docking,
+  Properties,
+  Prediction,
   PredictionMode
 } from './appConfig'
 
 export class AppConfigImpl implements AppConfig {
-  defaultConfig: DefaultConfig
-  docking: DockingConfig
-  prediction: PredictionConfig
-  molecularProperties: MolecularPropertiesConfig
+  general: General
+  docking: Docking
+  prediction: Prediction
+  properties: Properties
 
-  // Default constructor
   constructor(config?: Partial<AppConfig>) {
-    this.defaultConfig = {
-      projectCode: config?.defaultConfig?.projectCode || '',
-      workdir: config?.defaultConfig?.workdir || '',
-      fragments: config?.defaultConfig?.fragments || '',
-      numGen: config?.defaultConfig?.numGen || '',
-      numPerGen: config?.defaultConfig?.numPerGen || '',
-      seedPerGen: config?.defaultConfig?.seedPerGen || '',
-      startGen: config?.defaultConfig?.startGen || '',
-      dockingProgram: config?.defaultConfig?.dockingProgram || 'vina',
-      cpu: config?.defaultConfig?.cpu || '',
-      gpu: config?.defaultConfig?.gpu || '',
-      ruleDb: config?.defaultConfig?.ruleDb || ''
+    this.general = {
+      projectCode: config?.general?.projectCode || '',
+      workdir: config?.general?.workdir || '',
+      fragments: config?.general?.fragments || '',
+      numGen: config?.general?.numGen || '',
+      numPerGen: config?.general?.numPerGen || '',
+      seedPerGen: config?.general?.seedPerGen || '',
+      startGen: config?.general?.startGen || '',
+      cpu: config?.general?.cpu || '',
+      gpu: config?.general?.gpu || '',
+      ruleDb: config?.general?.ruleDb || ''
     }
 
     this.docking = {
+      dockingProgram: config?.docking?.dockingProgram || 'vina',
       target: config?.docking?.target || '',
       rmsd: config?.docking?.rmsd || '',
       deltaScore: config?.docking?.deltaScore || '',
@@ -48,45 +47,28 @@ export class AppConfigImpl implements AppConfig {
       dlScoreCutoff: config?.prediction?.dlScoreCutoff || ''
     }
 
-    this.molecularProperties = {
-      mw: config?.molecularProperties?.mw || '',
-      logpLower: config?.molecularProperties?.logpLower || '',
-      logpUpper: config?.molecularProperties?.logpUpper || '',
-      chiralCenter: config?.molecularProperties?.chiralCenter || '',
-      heteroatomRatio: config?.molecularProperties?.heteroatomRatio || '',
-      rdkitRotatableBoundNum:
-        config?.molecularProperties?.rdkitRotatableBoundNum || '',
-      keenRotatableBoundNum:
-        config?.molecularProperties?.keenRotatableBoundNum || '',
-      rigidBodyNum: config?.molecularProperties?.rigidBodyNum || '',
-      hbd: config?.molecularProperties?.hbd || '',
-      hba: config?.molecularProperties?.hba || '',
-      tpsa: config?.molecularProperties?.tpsa || '',
-      lipinskiViolation: config?.molecularProperties?.lipinskiViolation || '',
-      qed: config?.molecularProperties?.qed || '',
-      maxRingSize: config?.molecularProperties?.maxRingSize || '',
-      maxRingSystemSize: config?.molecularProperties?.maxRingSystemSize || '',
-      ringSystemCount: config?.molecularProperties?.ringSystemCount || '',
-      bridgedSiteCount: config?.molecularProperties?.bridgedSiteCount || '',
-      spiroSiteCount: config?.molecularProperties?.spiroSiteCount || '',
-      fusedSiteCount: config?.molecularProperties?.fusedSiteCount || '',
-      rdkitSaScore: config?.molecularProperties?.rdkitSaScore || '',
-      substructureFilter: config?.molecularProperties?.substructureFilter || ''
+    this.properties = {
+      mw: config?.properties?.mw || '',
+      logpLower: config?.properties?.logpLower || '',
+      logpUpper: config?.properties?.logpUpper || '',
+      chiralCenter: config?.properties?.chiralCenter || '',
+      heteroatomRatio: config?.properties?.heteroatomRatio || '',
+      rdkitRotatableBoundNum: config?.properties?.rdkitRotatableBoundNum || '',
+      keenRotatableBoundNum: config?.properties?.keenRotatableBoundNum || '',
+      rigidBodyNum: config?.properties?.rigidBodyNum || '',
+      hbd: config?.properties?.hbd || '',
+      hba: config?.properties?.hba || '',
+      tpsa: config?.properties?.tpsa || '',
+      lipinskiViolation: config?.properties?.lipinskiViolation || '',
+      qed: config?.properties?.qed || '',
+      maxRingSize: config?.properties?.maxRingSize || '',
+      maxRingSystemSize: config?.properties?.maxRingSystemSize || '',
+      ringSystemCount: config?.properties?.ringSystemCount || '',
+      bridgedSiteCount: config?.properties?.bridgedSiteCount || '',
+      spiroSiteCount: config?.properties?.spiroSiteCount || '',
+      fusedSiteCount: config?.properties?.fusedSiteCount || '',
+      rdkitSaScore: config?.properties?.rdkitSaScore || '',
+      substructureFilter: config?.properties?.substructureFilter || ''
     }
-  }
-
-  // Method to update the default configuration
-  updateDefaultConfig(newConfig: Partial<DefaultConfig>): void {
-    this.defaultConfig = { ...this.defaultConfig, ...newConfig }
-  }
-
-  // Method to display the entire configuration
-  displayConfig(): void {
-    console.log(JSON.stringify(this, null, 2))
-  }
-
-  // Method to reset to default configuration
-  resetToDefaultConfig(defaults: DefaultConfig): void {
-    this.defaultConfig = defaults
   }
 }

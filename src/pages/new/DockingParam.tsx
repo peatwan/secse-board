@@ -1,19 +1,24 @@
-import { Input } from '@nextui-org/react'
+import { Input, Select, SelectItem } from '@nextui-org/react'
 import { useProjectStore } from 'utils/store'
 import SmoothCollapse from 'react-smooth-collapse'
-import { DockingConfig } from './types/appConfig'
+import { Docking, DockingProgram } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
 
 interface Props {
-  dockingConfig: DockingConfig
+  docking: Docking
   handleUpdate: <V>(path: AppConfigPaths, value: V) => void
 }
 
-const DockingParameters: React.FC<Props> = ({
-  dockingConfig,
-  handleUpdate
-}) => {
+const dockingPrograms = [
+  { key: 'vina', label: 'AutoDock Vina' },
+  { key: 'glide', label: 'Glide' },
+  { key: 'autodock-gpu', label: 'Autodock-GPU' },
+  { key: 'unidock', label: 'Uni-Dock' }
+]
+
+const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
   const { dockingProgram } = useProjectStore()
+  const { setDockingProgram } = useProjectStore()
 
   return (
     <div>
@@ -21,12 +26,29 @@ const DockingParameters: React.FC<Props> = ({
         Docking Parameters
       </span>
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div className="sm:col-span-2">
+          <Select
+            label="Docking Program"
+            selectedKeys={[docking.dockingProgram]}
+            onSelectionChange={(keys) => {
+              const value = keys.currentKey
+              handleUpdate('docking.dockingProgram', value ? value : 'vina')
+              setDockingProgram(
+                value ? (value as DockingProgram) : ('vina' as DockingProgram)
+              )
+            }}
+          >
+            {dockingPrograms.map((item) => (
+              <SelectItem key={item.key}>{item.label}</SelectItem>
+            ))}
+          </Select>
+        </div>
         <div className="gap-3 sm:col-span-4">
           <Input
             type="text"
             labelPlacement="inside"
             label="Target"
-            value={dockingConfig.target}
+            value={docking.target}
             onValueChange={(value) => handleUpdate('docking.target', value)}
             readOnly
           />
@@ -44,7 +66,7 @@ const DockingParameters: React.FC<Props> = ({
                   type="text"
                   labelPlacement="inside"
                   label="X"
-                  value={dockingConfig.x}
+                  value={docking.x}
                   onValueChange={(value) => handleUpdate('docking.x', value)}
                 />
               </div>
@@ -53,7 +75,7 @@ const DockingParameters: React.FC<Props> = ({
                   type="text"
                   labelPlacement="inside"
                   label="Y"
-                  value={dockingConfig.y}
+                  value={docking.y}
                   onValueChange={(value) => handleUpdate('docking.y', value)}
                 />
               </div>
@@ -62,7 +84,7 @@ const DockingParameters: React.FC<Props> = ({
                   type="text"
                   labelPlacement="inside"
                   label="Z"
-                  value={dockingConfig.z}
+                  value={docking.z}
                   onValueChange={(value) => handleUpdate('docking.z', value)}
                 />
               </div>
@@ -71,7 +93,7 @@ const DockingParameters: React.FC<Props> = ({
                   type="text"
                   labelPlacement="inside"
                   label="X Box Size"
-                  value={dockingConfig.boxSizeX}
+                  value={docking.boxSizeX}
                   onValueChange={(value) =>
                     handleUpdate('docking.boxSizeX', value)
                   }
@@ -82,7 +104,7 @@ const DockingParameters: React.FC<Props> = ({
                   type="text"
                   labelPlacement="inside"
                   label="Y Box Size"
-                  value={dockingConfig.boxSizeY}
+                  value={docking.boxSizeY}
                   onValueChange={(value) =>
                     handleUpdate('docking.boxSizeY', value)
                   }
@@ -93,7 +115,7 @@ const DockingParameters: React.FC<Props> = ({
                   type="text"
                   labelPlacement="inside"
                   label="Z Box Size"
-                  value={dockingConfig.boxSizeZ}
+                  value={docking.boxSizeZ}
                   onValueChange={(value) =>
                     handleUpdate('docking.boxSizeZ', value)
                   }
@@ -112,7 +134,7 @@ const DockingParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="RMSE Threshold (Å)"
-            value={dockingConfig.rmsd}
+            value={docking.rmsd}
             onValueChange={(value) => handleUpdate('docking.rmsd', value)}
           />
         </div>
@@ -121,7 +143,7 @@ const DockingParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Delta Score (kcal/mol)"
-            value={dockingConfig.deltaScore}
+            value={docking.deltaScore}
             onValueChange={(value) => handleUpdate('docking.deltaScore', value)}
           />
         </div>
@@ -130,7 +152,7 @@ const DockingParameters: React.FC<Props> = ({
             type="text"
             labelPlacement="inside"
             label="Score Cutoff (kcal/mol)"
-            value={dockingConfig.scoreCutoff}
+            value={docking.scoreCutoff}
             onValueChange={(value) =>
               handleUpdate('docking.scoreCutoff', value)
             }
@@ -141,4 +163,4 @@ const DockingParameters: React.FC<Props> = ({
   )
 }
 
-export default DockingParameters
+export default DockingParam

@@ -15,7 +15,7 @@ const modeList = [
   }
 ]
 
-function PredictionParameters() {
+function PredictionParam() {
   return (
     <div>
       <span className="text-xl font-medium leading-7 text-gray-900 ">
@@ -44,4 +44,4 @@ function PredictionParameters() {
   )
 }
 
-export default PredictionParameters
+export default PredictionParam
