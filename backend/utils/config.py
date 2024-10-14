@@ -73,6 +73,20 @@ class MolecularPropertiesConfig:
     substructure_filter: int
 
 
+# set attribute with type cast
+def set_attribute(self, name: str, value):
+    try:
+        expected_type = type(getattr(self, name))
+        setattr(self, name, expected_type(value))
+    except Exception:
+        logger.error(
+            f"Invalid type for {name}. Expected {expected_type}, got {type(value)}"
+        )
+        raise TypeError(
+            f"Invalid type for {name}. Expected {expected_type}, got {type(value)}"
+        )
+
+
 class Config:
     def __init__(self, config_file: str):
         self.config_file = config_file
@@ -315,10 +329,7 @@ class Config:
             ConfigError: If there is an error setting the options.
         """
         try:
-            if (
-                not self.config_parser.has_section(section)
-                and section != "default_config"
-            ):
+            if not self.config_parser.has_section(section):
                 self.config_parser.add_section(section)
                 logger.info(f"Added new section '{section}' to the configuration.")
 
@@ -328,25 +339,25 @@ class Config:
 
                 # Update corresponding dataclass if applicable
                 if section == "default_config" and hasattr(self.default_config, option):
-                    setattr(self.default_config, option, value)
+                    set_attribute(self.default_config, option, value)
                 elif (
                     section == "docking"
                     and self.docking
                     and hasattr(self.docking, option)
                 ):
-                    setattr(self.docking, option, value)
+                    set_attribute(self.docking, option, value)
                 elif (
                     section == "prediction"
                     and self.prediction
                     and hasattr(self.prediction, option)
                 ):
-                    setattr(self.prediction, option, value)
+                    set_attribute(self.prediction, option, value)
                 elif (
                     section == "molecular_properties"
                     and self.molecular_properties
                     and hasattr(self.molecular_properties, option)
                 ):
-                    setattr(self.molecular_properties, option, value)
+                    set_attribute(self.molecular_properties, option, value)
 
         except Exception as e:
             logger.error(f"Error setting multiple options in section '{section}': {e}")

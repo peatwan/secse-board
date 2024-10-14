@@ -13,7 +13,7 @@ function App() {
   return (
     <NextUIProvider navigate={navigate}>
       <div className="container mx-auto">
-        <Toaster position="top-center" />
+        <Toaster position="top-center" richColors />
         <NaviBar />
         <div className="px-4 text-gray-900 antialiased">
           <Routes>

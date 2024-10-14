@@ -8,7 +8,7 @@ from utils.strutil import (
     convert_dict_from_snake_to_camel_case,
     convert_dict_from_camel_to_snake_case,
 )
-from utils.config import Config
+from utils.config import Config, ConfigError
 import json
 
 app = Flask(__name__)
@@ -201,7 +201,8 @@ def get_config():
         }
         app_config_camel = convert_dict_from_snake_to_camel_case(app_config)
         return jsonify(app_config_camel), 200
-
+    except ConfigError as e:
+        return jsonify({"error": "Parameters fail to get!"}), 400
     except Exception as e:
         logger.error(e)
         return jsonify({"error": str(e)}), 500
@@ -228,10 +229,11 @@ def save_config():
         )
         config.save()
         return (
-            jsonify({"message": "Paramters Saved successfully"}),
+            jsonify({"message": "Parameters saved successfully"}),
             200,
         )
-
+    except ConfigError as e:
+        return jsonify({"error": "Parameters fail to save!"}), 400
     except Exception as e:
         logger.error(e)
         return jsonify({"error": str(e)}), 500

@@ -1,4 +1,14 @@
-import { BreadcrumbItem, Breadcrumbs, Button } from '@nextui-org/react'
+import {
+  BreadcrumbItem,
+  Breadcrumbs,
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure
+} from '@nextui-org/react'
 import DefaultParameters from './DefaultParameters'
 import DockingParameters from './DockingParameters'
 import MolecularProperties from './MolecularProperties'
@@ -15,6 +25,7 @@ import { updateNestedProperty } from 'utils'
 const Param = () => {
   const { path, status } = useProjectStore()
   const [appConfig, setAppConfig] = useState<AppConfig>(new AppConfigImpl())
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
 
   useEffect(() => {
     if (status === 'Created' && path) {
@@ -40,7 +51,11 @@ const Param = () => {
         toast.success(res.data.message)
       })
       .catch((e) => {
-        toast.error(e.message)
+        if (e.status === 400) {
+          toast.error(e.response.data.error)
+        } else {
+          toast.error(e.message)
+        }
       })
   }
 
@@ -54,6 +69,7 @@ const Param = () => {
           toast.error(e.message)
         })
     }
+    onClose()
   }
 
   return (
@@ -89,15 +105,38 @@ const Param = () => {
           </div>
 
           <div className="mt-6 flex items-center justify-end gap-x-6 pb-10">
-            <Button color="danger" variant="flat" onPress={handleReset}>
+            <Button color="danger" variant="flat" onPress={onOpen}>
               Reset
             </Button>
-            <Button color="primary" onPress={handleSave}>
+            <Button color="primary" variant="flat" onPress={handleSave}>
               Save
             </Button>
           </div>
         </div>
       </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Warning</ModalHeader>
+              <ModalBody>
+                <p>
+                  All unsaved changes will be <b>lost</b>. Are you sure you want
+                  to <b>reset</b>?
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="flat" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button color="danger" variant="flat" onPress={handleReset}>
+                  OK
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   )
 }
