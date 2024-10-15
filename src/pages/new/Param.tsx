@@ -114,7 +114,7 @@ const Param = () => {
             <Button color="danger" variant="flat" onPress={onOpen}>
               Reset
             </Button>
-            <Button color="primary" variant="flat" onPress={handleSave}>
+            <Button color="primary" onPress={handleSave}>
               Save
             </Button>
           </div>

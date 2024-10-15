@@ -4,6 +4,7 @@ from datetime import datetime
 from loguru import logger
 from loguru._defaults import LOGURU_FORMAT
 import shutil
+from utils.path import get_user_directory
 from utils.strutil import (
     convert_dict_from_snake_to_camel_case,
     convert_dict_from_camel_to_snake_case,
@@ -112,28 +113,18 @@ def create_folder():
 def create_project():
     # Get args from request data
     workingDirectory = request.json.get("workingDirectory")
-    fragments = request.json.get("fragmentsFile")
-    target = request.json.get("targetFile")
     project_code = request.json.get("projectName")
 
     # Validate args are provided
-    if not workingDirectory or not fragments or not target or not project_code:
+    if not workingDirectory or not project_code:
         return (
-            jsonify(
-                {
-                    "error": "Working directory, fragments file, target file and project name must be provided"
-                }
-            ),
+            jsonify({"error": "Working directory and project name must be provided"}),
             400,
         )
 
     # Validate directory or file exist
     if not os.path.exists(workingDirectory):
         return jsonify({"error": "Working directory does not exist"}), 400
-    if not os.path.exists(fragments) or not os.path.isfile(fragments):
-        return jsonify({"error": "Fragments file does not exist"}), 400
-    if not os.path.exists(target) or not os.path.isfile(target):
-        return jsonify({"error": "Target file does not exist"}), 400
 
     # Construct the full path for the new project
     new_project_path = os.path.join(workingDirectory, project_code)
@@ -159,11 +150,13 @@ def create_project():
         config = Config(config_file_path)
         logger.info("Config file loaded")
 
+        default_directory = get_user_directory()
+
         # Set values and save to file
         config.set_value("general", "project_code", project_code)
         config.set_value("general", "workdir", new_project_path)
-        config.set_value("general", "fragments", fragments)
-        config.set_value("docking", "target", fragments)
+        config.set_value("general", "fragments", default_directory)
+        config.set_value("docking", "target", default_directory)
 
         # Save changes to the configuration file
         config.save()
@@ -220,6 +213,16 @@ def save_config():
 
     configDict = convert_dict_from_camel_to_snake_case(configDict)
 
+    if not os.path.exists(configDict["general"]["fragments"]) or not os.path.isfile(
+        configDict["general"]["fragments"]
+    ):
+        return jsonify({"error": "Fragments file does not exist"}), 400
+
+    if not os.path.exists(configDict["docking"]["target"]) or not os.path.isfile(
+        configDict["docking"]["target"]
+    ):
+        return jsonify({"error": "Target file does not exist"}), 400
+
     config_file = os.path.join(directory, "config.ini")
     try:
         config = Config(config_file)
@@ -242,8 +245,7 @@ def save_config():
 # Get default directory
 @app.route("/secse/get_default_directory", methods=["GET"])
 def get_default_directory():
-    home_dir = os.path.expanduser("~/Projects/test/")
-    return jsonify(home_dir), 200
+    return jsonify(get_user_directory()), 200
 
 
 if __name__ == "__main__":

@@ -3,8 +3,6 @@ import { AppConfig } from 'pages/new/types/appConfig'
 
 export const createProject = (
   workingDirectory: string,
-  fragmentsFile: string,
-  targetFile: string,
   projectName: string
 ) => {
   return axios({
@@ -12,8 +10,6 @@ export const createProject = (
     url: '/secse/create_project',
     data: {
       workingDirectory: workingDirectory,
-      fragmentsFile: fragmentsFile,
-      targetFile: targetFile,
       projectName: projectName
     }
   })

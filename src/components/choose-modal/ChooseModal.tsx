@@ -172,11 +172,11 @@ const ChooseModal: React.FC<Props> = ({
           {() => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Folder Name
+                Create New Folder
               </ModalHeader>
               <ModalBody>
                 <Input
-                  isRequired
+                  placeholder="Please input folder name"
                   value={folderName}
                   onValueChange={setFolderName}
                 ></Input>

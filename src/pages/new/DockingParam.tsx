@@ -1,8 +1,10 @@
-import { Input, Select, SelectItem } from '@nextui-org/react'
+import { Button, Input, Select, SelectItem } from '@nextui-org/react'
 import { useProjectStore } from 'utils/store'
 import SmoothCollapse from 'react-smooth-collapse'
 import { Docking, DockingProgram } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
+import { useState } from 'react'
+import ChooseModal from 'components/choose-modal/ChooseModal'
 
 interface Props {
   docking: Docking
@@ -19,14 +21,20 @@ const dockingPrograms = [
 const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
   const { dockingProgram } = useProjectStore()
   const { setDockingProgram } = useProjectStore()
-
+  const [isTargetFileModalOpen, setIsTargetFileModalOpen] = useState(false)
+  const handleTargetFileModalClose = () => {
+    setIsTargetFileModalOpen(false)
+  }
+  const handleTargetFileSave = (directory: string) => {
+    handleUpdate('docking.target', directory)
+  }
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
         Docking
       </span>
-      <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-        <div className="sm:col-span-2">
+      <div className="mt-5 grid grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div className="sm:col-span-3">
           <Select
             label="Docking Program"
             selectedKeys={[docking.dockingProgram]}
@@ -50,8 +58,18 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             label="Target"
             value={docking.target}
             onValueChange={(value) => handleUpdate('docking.target', value)}
-            readOnly
           />
+        </div>
+        <div className="sm:col-span-2">
+          <Button
+            color="primary"
+            variant="flat"
+            onPress={() => {
+              setIsTargetFileModalOpen(true)
+            }}
+          >
+            Choose
+          </Button>
         </div>
         <div className="gap-3 sm:col-span-6">
           <SmoothCollapse expanded={dockingProgram === 'vina'}>
@@ -158,6 +176,17 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             }
           />
         </div>
+      </div>
+      <div>
+        {isTargetFileModalOpen && (
+          <ChooseModal
+            currentDirectory={docking.target}
+            mode="file"
+            isModalOpen={isTargetFileModalOpen}
+            handleClose={handleTargetFileModalClose}
+            onSave={handleTargetFileSave}
+          ></ChooseModal>
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,8 @@
-import { Input } from '@nextui-org/react'
+import { Button, Input } from '@nextui-org/react'
 import { General } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
+import { useState } from 'react'
+import ChooseModal from 'components/choose-modal/ChooseModal'
 
 interface Props {
   general: General
@@ -8,23 +10,33 @@ interface Props {
 }
 
 const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
+  const [isFragmentsFileModalOpen, setIsFragmentsFileModalOpen] =
+    useState(false)
+
+  const handleFragmentsFileModalClose = () => {
+    setIsFragmentsFileModalOpen(false)
+  }
+
+  const handleFragmentsFileSave = (directory: string) => {
+    handleUpdate('general.fragments', directory)
+  }
+
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
         General
       </span>
-      <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
-        <div className="sm:col-span-2">
+      <div className="mt-5 grid grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-8">
+        <div className="sm:col-span-4">
           <Input
             type="text"
             labelPlacement="inside"
             label="Project Name"
             value={general.projectCode}
             isReadOnly
-            size="lg"
           />
         </div>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-4">
           <Input
             type="text"
             labelPlacement="inside"
@@ -33,14 +45,32 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             isReadOnly
           />
         </div>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-6">
           <Input
             type="text"
             labelPlacement="inside"
             label="Fragments"
             value={general.fragments}
-            isReadOnly
+            onValueChange={(value) => {
+              handleUpdate('general.fragments', value)
+            }}
           />
+        </div>
+        <div className="sm:col-span-1">
+          <Button
+            color="primary"
+            variant="flat"
+            onPress={() => {
+              setIsFragmentsFileModalOpen(true)
+            }}
+          >
+            Choose
+          </Button>
+        </div>
+        <div className="sm:col-span-1">
+          <Button color="secondary" variant="flat" onPress={() => {}}>
+            View
+          </Button>
         </div>
         <div className="sm:col-span-2">
           <Input
@@ -119,6 +149,17 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             }}
           />
         </div>
+      </div>
+      <div>
+        {isFragmentsFileModalOpen && (
+          <ChooseModal
+            currentDirectory={general.fragments}
+            mode="file"
+            isModalOpen={isFragmentsFileModalOpen}
+            handleClose={handleFragmentsFileModalClose}
+            onSave={handleFragmentsFileSave}
+          ></ChooseModal>
+        )}
       </div>
     </div>
   )
