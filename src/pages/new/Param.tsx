@@ -97,10 +97,16 @@ const Param = () => {
               />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
-              <PropertiesParam />
+              <PropertiesParam
+                properties={appConfig.properties}
+                handleUpdate={handleUpdate}
+              />
             </div>
             <div className="border-b border-gray-900/10 pb-10">
-              <PredictionParam />
+              <PredictionParam
+                prediction={appConfig.prediction}
+                handleUpdate={handleUpdate}
+              />
             </div>
           </div>
 

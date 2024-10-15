@@ -23,7 +23,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
-        Docking Parameters
+        Docking
       </span>
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
         <div className="sm:col-span-2">
@@ -133,7 +133,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           <Input
             type="text"
             labelPlacement="inside"
-            label="RMSE Threshold (Å)"
+            label="RMSD"
             value={docking.rmsd}
             onValueChange={(value) => handleUpdate('docking.rmsd', value)}
           />
@@ -142,7 +142,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           <Input
             type="text"
             labelPlacement="inside"
-            label="Delta Score (kcal/mol)"
+            label="Delta Score"
             value={docking.deltaScore}
             onValueChange={(value) => handleUpdate('docking.deltaScore', value)}
           />
@@ -151,7 +151,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           <Input
             type="text"
             labelPlacement="inside"
-            label="Score Cutoff (kcal/mol)"
+            label="Score Cutoff"
             value={docking.scoreCutoff}
             onValueChange={(value) =>
               handleUpdate('docking.scoreCutoff', value)

@@ -15,8 +15,8 @@ import {
   TableRow
 } from '@nextui-org/react'
 import { useCallback, useEffect, useState } from 'react'
-import { ArrowBackIcon } from './ArrowBackIcon'
-import { CreateNewFolderIcon } from './CreateNewFolderIcon'
+import { ArrowBackIcon } from 'assets/icons/ArrowBackIcon'
+import { CreateNewFolderIcon } from 'assets/icons/CreateNewFolderIcon'
 import { createFolder, getDirectoryItems } from 'api/components/choose-modal'
 import { toast } from 'sonner'
 import { formatDistance } from 'date-fns'

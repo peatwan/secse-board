@@ -11,7 +11,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   return (
     <div>
       <span className="text-xl font-semibold leading-7 text-gray-900">
-        Default Parameters
+        General
       </span>
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
         <div className="sm:col-span-2">

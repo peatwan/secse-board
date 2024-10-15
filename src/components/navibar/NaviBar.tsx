@@ -15,7 +15,7 @@ export const NaviBar = () => {
     <Navbar>
       <NavbarBrand>
         <AcmeLogo />
-        <p className="font-bold text-inherit">ACME</p>
+        <p className="font-bold text-inherit">SECSE</p>
       </NavbarBrand>
       <NavbarContent className="hidden gap-10 sm:flex" justify="start">
         <NavbarItem isActive={location.pathname === '/new'}>
@@ -46,12 +46,12 @@ export const NaviBar = () => {
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
+        {/* <NavbarItem className="hidden lg:flex">
           <Link href="#">Login</Link>
-        </NavbarItem>
+        </NavbarItem> */}
         <NavbarItem>
           <Button as={Link} color="primary" href="#" variant="flat">
-            Sign Up
+            Login
           </Button>
         </NavbarItem>
       </NavbarContent>
