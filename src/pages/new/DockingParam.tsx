@@ -33,7 +33,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
       <span className="text-xl font-semibold leading-7 text-gray-900">
         Docking
       </span>
-      <div className="mt-5 grid grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-6">
+      <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
         <div className="sm:col-span-3">
           <Select
             label="Docking Program"
@@ -60,7 +60,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             onValueChange={(value) => handleUpdate('docking.target', value)}
           />
         </div>
-        <div className="sm:col-span-2">
+        <div className="flex items-center justify-start sm:col-span-2">
           <Button
             color="primary"
             variant="flat"
@@ -86,6 +86,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
                   label="X"
                   value={docking.x}
                   onValueChange={(value) => handleUpdate('docking.x', value)}
+                  validate={(e) => {
+                    if (isNaN(Number(e))) {
+                      return 'Please enter a number'
+                    }
+                  }}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -95,6 +100,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
                   label="Y"
                   value={docking.y}
                   onValueChange={(value) => handleUpdate('docking.y', value)}
+                  validate={(e) => {
+                    if (isNaN(Number(e))) {
+                      return 'Please enter a number'
+                    }
+                  }}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -104,6 +114,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
                   label="Z"
                   value={docking.z}
                   onValueChange={(value) => handleUpdate('docking.z', value)}
+                  validate={(e) => {
+                    if (isNaN(Number(e))) {
+                      return 'Please enter a number'
+                    }
+                  }}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -115,6 +130,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
                   onValueChange={(value) =>
                     handleUpdate('docking.boxSizeX', value)
                   }
+                  validate={(e) => {
+                    if (isNaN(Number(e))) {
+                      return 'Please enter a number'
+                    }
+                  }}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -126,6 +146,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
                   onValueChange={(value) =>
                     handleUpdate('docking.boxSizeY', value)
                   }
+                  validate={(e) => {
+                    if (isNaN(Number(e))) {
+                      return 'Please enter a number'
+                    }
+                  }}
                 />
               </div>
               <div className="sm:col-span-2">
@@ -137,6 +162,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
                   onValueChange={(value) =>
                     handleUpdate('docking.boxSizeZ', value)
                   }
+                  validate={(e) => {
+                    if (isNaN(Number(e))) {
+                      return 'Please enter a number'
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -154,6 +184,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             label="RMSD"
             value={docking.rmsd}
             onValueChange={(value) => handleUpdate('docking.rmsd', value)}
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -163,6 +198,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             label="Delta Score"
             value={docking.deltaScore}
             onValueChange={(value) => handleUpdate('docking.deltaScore', value)}
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -174,6 +214,11 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('docking.scoreCutoff', value)
             }
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
       </div>

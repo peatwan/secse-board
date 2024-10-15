@@ -52,6 +52,11 @@ const PredictionParam: React.FC<Props> = ({ prediction, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('prediction.dlPerGen', value)
             }
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-4">
@@ -63,6 +68,11 @@ const PredictionParam: React.FC<Props> = ({ prediction, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('prediction.dlScoreCutoff', value)
             }
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
       </div>

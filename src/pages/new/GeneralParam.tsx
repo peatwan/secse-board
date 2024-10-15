@@ -26,7 +26,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
       <span className="text-xl font-semibold leading-7 text-gray-900">
         General
       </span>
-      <div className="mt-5 grid grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-8">
+      <div className="mt-5 grid grid-cols-1  gap-x-6 gap-y-8 sm:grid-cols-8">
         <div className="sm:col-span-4">
           <Input
             type="text"
@@ -56,7 +56,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             }}
           />
         </div>
-        <div className="sm:col-span-1">
+        <div className="flex items-center justify-start sm:col-span-1">
           <Button
             color="primary"
             variant="flat"
@@ -67,7 +67,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             Choose
           </Button>
         </div>
-        <div className="sm:col-span-1">
+        <div className="flex items-center justify-start sm:col-span-1">
           <Button color="secondary" variant="flat" onPress={() => {}}>
             View
           </Button>
@@ -81,6 +81,11 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             onValueChange={(value) => {
               handleUpdate('general.numGen', value)
             }}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -91,6 +96,11 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             value={general.numPerGen}
             onValueChange={(value) => {
               handleUpdate('general.numPerGen', value)
+            }}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
             }}
           />
         </div>
@@ -103,6 +113,11 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             onValueChange={(value) => {
               handleUpdate('general.seedPerGen', value)
             }}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -113,6 +128,11 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             value={general.startGen}
             onValueChange={(value) => {
               handleUpdate('general.startGen', value)
+            }}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
             }}
           />
         </div>
@@ -125,6 +145,11 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             onValueChange={(value) => {
               handleUpdate('general.cpu', value)
             }}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -135,6 +160,11 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             value={general.gpu}
             onValueChange={(value) => {
               handleUpdate('general.gpu', value)
+            }}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
             }}
           />
         </div>

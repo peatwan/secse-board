@@ -25,6 +25,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             label="Molecular Weights Cutoff"
             value={properties.mw}
             onValueChange={(value) => handleUpdate('properties.mw', value)}
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -36,6 +41,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('properties.logpLower', value)
             }
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -45,8 +55,13 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             label="logP Max"
             value={properties.logpUpper}
             onValueChange={(value) =>
-              handleUpdate('properties.logpLower', value)
+              handleUpdate('properties.logpUpper', value)
             }
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -58,6 +73,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('properties.chiralCenter', value)
             }
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -69,6 +89,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('properties.heteroatomRatio', value)
             }
+            validate={(e) => {
+              if (isNaN(Number(e))) {
+                return 'Please enter a number'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-3">
@@ -80,6 +105,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('properties.rdkitRotatableBoundNum', value)
             }
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
         <div className="sm:col-span-3">
@@ -91,6 +121,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             onValueChange={(value) =>
               handleUpdate('properties.rigidBodyNum', value)
             }
+            validate={(e) => {
+              if (!Number.isInteger(Number(e))) {
+                return 'Please enter an integer'
+              }
+            }}
           />
         </div>
       </div>
@@ -118,6 +153,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               label="KEEN Rotatable Bound Number Max "
               value={properties.keenRotatableBoundNum}
               onValueChange={(value) => handleUpdate('properties.mw', value)}
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -127,6 +167,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               label="HBD Max"
               value={properties.hbd}
               onValueChange={(value) => handleUpdate('properties.hbd', value)}
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -136,6 +181,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               label="HBA Max"
               value={properties.hba}
               onValueChange={(value) => handleUpdate('properties.hba', value)}
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -145,17 +195,27 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               label="TPSA Max"
               value={properties.tpsa}
               onValueChange={(value) => handleUpdate('properties.tpsa', value)}
+              validate={(e) => {
+                if (isNaN(Number(e))) {
+                  return 'Please enter a number'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
             <Input
               type="text"
               labelPlacement="inside"
-              label="Violation of Lipinski Rule"
+              label="Lipinski Rule Violation Max"
               value={properties.lipinskiViolation}
               onValueChange={(value) =>
                 handleUpdate('properties.lipinskiViolation', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -165,6 +225,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               label="QED Cutoff"
               value={properties.qed}
               onValueChange={(value) => handleUpdate('properties.qed', value)}
+              validate={(e) => {
+                if (isNaN(Number(e))) {
+                  return 'Please enter a number'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -176,6 +241,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.maxRingSize', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -187,6 +257,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.maxRingSystemSize', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -198,6 +273,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.ringSystemCount', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -209,6 +289,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.bridgedSiteCount', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -220,6 +305,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.spiroSiteCount', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -231,6 +321,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.fusedSiteCount', value)
               }
+              validate={(e) => {
+                if (!Number.isInteger(Number(e))) {
+                  return 'Please enter an integer'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
@@ -242,6 +337,11 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               onValueChange={(value) =>
                 handleUpdate('properties.rdkitSaScore', value)
               }
+              validate={(e) => {
+                if (isNaN(Number(e))) {
+                  return 'Please enter a number'
+                }
+              }}
             />
           </div>
           <div className="sm:col-span-2">
