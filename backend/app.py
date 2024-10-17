@@ -248,6 +248,33 @@ def get_default_directory():
     return jsonify(get_user_directory()), 200
 
 
+@app.route("/secse/get_smiles_from_file", methods=["GET"])
+def get_smiles_from_file():
+    smiles_file_path = request.args.get("smiles_file_path")
+    # Validate if directory is provided and exists
+    if not smiles_file_path or not os.path.isfile(smiles_file_path):
+        return jsonify({"error": "Smiles file not provided or does not exist"}), 400
+
+    molecules = []
+    try:
+        with open(smiles_file_path, "r") as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    parts = line.split()
+                    molecule = {
+                        "smiles": parts[0],  # The SMILES string of the molecule
+                    }
+                    if len(parts) > 1:
+                        # Assuming the second part is the molecule's  ID
+                        molecule["id"] = parts[1]
+                    molecules.append(molecule)
+        return jsonify(molecules), 200
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     # logger configuration
     logger.configure(

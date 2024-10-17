@@ -232,8 +232,7 @@ const ChooseModal: React.FC<Props> = ({
           )}
         </div>
         <Table
-          aria-label="Example table with dynamic content"
-          selectionMode="multiple"
+          selectionMode="single"
           selectionBehavior="replace"
           classNames={{
             base: 'max-h-[450px]'

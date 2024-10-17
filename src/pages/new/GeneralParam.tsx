@@ -1,8 +1,21 @@
-import { Button, Input } from '@nextui-org/react'
+import {
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Tab,
+  Tabs,
+  useDisclosure
+} from '@nextui-org/react'
 import { General } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
 import { useState } from 'react'
 import ChooseModal from 'components/choose-modal/ChooseModal'
+import MoleculeEditor from 'components/molecule-editor/MoleculeEditor'
+import MoleculeViewer from 'components/molecule-viewer/MoleculeViewer'
 
 interface Props {
   general: General
@@ -13,12 +26,28 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   const [isFragmentsFileModalOpen, setIsFragmentsFileModalOpen] =
     useState(false)
 
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+
+  const [fragmentsViewModalTabKeys, setFragmentsViewModalTabKeys] =
+    useState('view')
+
+  const [smiles4Edit, setSmiles4Edit] = useState('c1ccccc1')
+
   const handleFragmentsFileModalClose = () => {
     setIsFragmentsFileModalOpen(false)
   }
 
   const handleFragmentsFileSave = (directory: string) => {
     handleUpdate('general.fragments', directory)
+  }
+
+  const handleEditMolecule = (smiles: string) => {
+    setSmiles4Edit(smiles)
+    setFragmentsViewModalTabKeys('edit')
+  }
+
+  const handleSave = () => {
+    onClose()
   }
 
   return (
@@ -68,7 +97,13 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
           </Button>
         </div>
         <div className="flex items-center justify-start sm:col-span-1">
-          <Button color="secondary" variant="flat" onPress={() => {}}>
+          <Button
+            color="secondary"
+            variant="flat"
+            onPress={() => {
+              onOpen()
+            }}
+          >
             View
           </Button>
         </div>
@@ -191,6 +226,52 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
           ></ChooseModal>
         )}
       </div>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size="4xl"
+        classNames={{
+          body: 'min-h-[600px] max-h-[600px]'
+        }}
+        scrollBehavior="inside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Molecule Viewer
+              </ModalHeader>
+              <ModalBody>
+                <Tabs
+                  selectedKey={fragmentsViewModalTabKeys}
+                  onSelectionChange={(key) => {
+                    setFragmentsViewModalTabKeys(key.toString())
+                  }}
+                  variant="underlined"
+                >
+                  <Tab key="view" title="View">
+                    <MoleculeViewer
+                      smilesFilePath={general.fragments}
+                      handleEdit={handleEditMolecule}
+                    />
+                  </Tab>
+                  <Tab key="edit" title="Edit">
+                    <MoleculeEditor smiles={smiles4Edit} />
+                  </Tab>
+                </Tabs>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" variant="flat" onPress={handleSave}>
+                  Save
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   )
 }
