@@ -10,7 +10,7 @@ import {
 } from '@nextui-org/react'
 import { General } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ChooseModal from 'components/choose-modal/ChooseModal'
 import MoleculeEditor from 'components/molecule-editor/MoleculeEditor'
 import MoleculeViewer from 'components/molecule-viewer/MoleculeViewer'
@@ -55,15 +55,18 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
     }
   }, [general.fragments, isMoleculeViewModalOpen])
 
+  useMemo(() => {
+    const set = new Set<string>()
+    smilesList.forEach((e: Smiles) => {
+      set.add(e.id)
+    })
+    setSmilesIdSet(set)
+  }, [smilesList])
+
   const loadSmiles = (smilesFilePath: string) => {
     getSmilesFromFile(smilesFilePath)
       .then((res) => {
         setSmilesList(res.data)
-        const set = new Set<string>()
-        res.data.forEach((e: Smiles) => {
-          set.add(e.id)
-        })
-        setSmilesIdSet(set)
       })
       .catch((e) => {
         if (e.status === 400) {
