@@ -17,9 +17,10 @@ import {
 import { DeleteIcon } from 'assets/icons/DeleteIcon'
 import { EditIcon } from 'assets/icons/EditIcon'
 import { EyeIcon } from 'assets/icons/EyeIcon'
+import { PlusIcon } from 'assets/icons/PlusIcon'
 import MoleculeStructure from 'components/molecule-structure/MoleculeStructure'
 import { Smiles } from 'pages/new/GeneralParam'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 interface Props {
   smilesList: Smiles[]
@@ -120,9 +121,25 @@ const MoleculeViewer: React.FC<Props> = ({ smilesList, onEdit, onDelete }) => {
     [onViewModalOpen, onEdit, onDeleteModalOpen]
   )
 
+  const topContent = useMemo(() => {
+    return (
+      <div className="flex justify-end">
+        <Button
+          color="primary"
+          endContent={<PlusIcon />}
+          size="sm"
+          onPress={() => onEdit('', '')}
+        >
+          Add New
+        </Button>
+      </div>
+    )
+  }, [onEdit])
+
   return (
     <div>
       <Table
+        topContent={topContent}
         classNames={{
           base: 'max-h-[600px]'
         }}

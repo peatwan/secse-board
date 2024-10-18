@@ -25,7 +25,7 @@ const modeList = [
 const PredictionParam: React.FC<Props> = ({ prediction, handleUpdate }) => {
   return (
     <div>
-      <span className="text-xl font-medium leading-7 text-gray-900 ">
+      <span className="text-xl font-semibold leading-7 text-gray-900 ">
         Prediction
       </span>
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

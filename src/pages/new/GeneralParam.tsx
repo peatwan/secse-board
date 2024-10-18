@@ -45,6 +45,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   const [smilesList, setSmilesList] = useState<Smiles[]>([])
   const [id4Edit, setId4Edit] = useState('')
   const [smiles4Edit, setSmiles4Edit] = useState('')
+  const [smilesIdSet, setSmilesIdSet] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (isMoleculeViewModalOpen) {
@@ -54,18 +55,15 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
     }
   }, [general.fragments, isMoleculeViewModalOpen])
 
-  const handleFragmentsFileModalClose = () => {
-    setIsFragmentsFileModalOpen(false)
-  }
-
-  const handleFragmentsFileSave = (directory: string) => {
-    handleUpdate('general.fragments', directory)
-  }
-
   const loadSmiles = (smilesFilePath: string) => {
     getSmilesFromFile(smilesFilePath)
       .then((res) => {
         setSmilesList(res.data)
+        const set = new Set<string>()
+        res.data.forEach((e: Smiles) => {
+          set.add(e.id)
+        })
+        setSmilesIdSet(set)
       })
       .catch((e) => {
         if (e.status === 400) {
@@ -74,6 +72,14 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
           toast.error(e.message)
         }
       })
+  }
+
+  const handleFragmentsFileModalClose = () => {
+    setIsFragmentsFileModalOpen(false)
+  }
+
+  const handleFragmentsFileSave = (directory: string) => {
+    handleUpdate('general.fragments', directory)
   }
 
   const handleEditMolecule = (id: string, smiles: string) => {
@@ -332,6 +338,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
                   <MoleculeEditor
                     smiles={smiles4Edit}
                     id={id4Edit}
+                    smilesIdSet={smilesIdSet}
                     onSaveEdit={handleSaveEdit}
                     onModeChange={(mode) => {
                       setFragmentsViewModalMode(mode)

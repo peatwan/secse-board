@@ -282,8 +282,14 @@ def update_smiles():
     id = request.json.get("id")
     smiles = request.json.get("smiles")
 
-    molecules = []
+    if not smiles_file_path:
+        return jsonify({"error": "File path must be provided!"}), 400
+    if not id:
+        return jsonify({"error": "Molecule ID must be provided!"}), 400
+    if not smiles:
+        return jsonify({"error": "Molecule can not be empty!"}), 400
 
+    molecules = []
     with open(smiles_file_path, "r") as file:
         for line in file:
             line = line.strip()
@@ -306,12 +312,17 @@ def update_smiles():
 
             logger.info(f"Updated {id} to new SMILES: {smiles}")
             return (
-                jsonify({"message": "Modification saved successfully"}),
+                jsonify({"message": f"Updated {id} successfully"}),
                 200,
             )
+    # if not found, insert as a new record
+    molecules.append({"smiles": smiles, "id": id})
+    with open(smiles_file_path, "w") as file:
+        for molecule in molecules:
+            file.write(f"{molecule['smiles']} {molecule['id']}\n")
 
-    logger.error(f"ID {id} not found.")
-    return jsonify({"error": "Modification fail to save!"}), 400
+    logger.info(f"New molecule(id: {id}, smiles: {smiles}) added successfully!")
+    return jsonify({"message": f"New molecule {id} added successfully"}), 200
 
 
 @app.route("/secse/delete_smiles", methods=["DELETE"])
@@ -346,8 +357,8 @@ def delete_smiles():
             200,
         )
     else:
-        logger.error(f"ID {id} not found.")
-        return jsonify({"error": "Modification fail to save!"}), 400
+        logger.error(f"Molecule {id} not found")
+        return jsonify({"error": "Molecule {id} not found"}), 400
 
 
 if __name__ == "__main__":

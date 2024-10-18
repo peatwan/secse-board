@@ -12,11 +12,12 @@ import {
 import { ArrowBackIcon } from 'assets/icons/ArrowBackIcon'
 import { SaveIcon } from 'assets/icons/SaveIcon'
 import { FragmentsViewModalMode } from 'pages/new/GeneralParam'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 interface Props {
   id: string
   smiles: string
+  smilesIdSet: Set<string>
   onSaveEdit: (id: string, smiles: string) => void
   onModeChange: (mode: FragmentsViewModalMode) => void
 }
@@ -41,11 +42,13 @@ const loadScript = (src: string, onload: () => void) => {
 const MoleculeEditor: React.FC<Props> = ({
   id,
   smiles,
+  smilesIdSet,
   onSaveEdit,
   onModeChange
 }) => {
   const instance = useRef<ChemicalViewType>(null)
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
+  const [idEdit, setIdEdit] = useState(id)
 
   useEffect(() => {
     let chemicalEditorInstance: ChemicalViewType = null
@@ -74,14 +77,18 @@ const MoleculeEditor: React.FC<Props> = ({
 
   const handleSave = () => {
     if (instance.current) {
-      onSaveEdit(id, instance.current.getSmiles())
+      onSaveEdit(idEdit, instance.current.getSmiles())
     }
   }
 
   const handleBack = () => {
     onOpen()
-    // onModeChange('viewer')
   }
+
+  const isInvalid = useMemo(() => {
+    if (id) return false
+    return smilesIdSet.has(idEdit) ? true : false
+  }, [id, idEdit, smilesIdSet])
 
   return (
     <div className="flex flex-col gap-4 py-2">
@@ -89,11 +96,14 @@ const MoleculeEditor: React.FC<Props> = ({
         <div className="max-w-80">
           <Input
             variant="flat"
-            isDisabled
+            isDisabled={id ? true : false}
             type="text"
             label="Molecule ID:"
             labelPlacement="outside-left"
-            value={id}
+            value={idEdit}
+            onValueChange={setIdEdit}
+            isInvalid={isInvalid}
+            errorMessage="Please enter an unused ID"
           />
         </div>
         <Tooltip content="Return to viewer" delay={500}>
