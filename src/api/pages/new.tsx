@@ -42,3 +42,30 @@ export const getDefaultDirectory = () => {
     url: '/secse/get_default_directory'
   })
 }
+
+export const updateSmiles = (
+  smilesFilePath: string,
+  id: string,
+  smiles: string
+) => {
+  return axios({
+    method: 'post',
+    url: '/secse/update_smiles',
+    data: {
+      smiles_file_path: smilesFilePath,
+      id: id,
+      smiles: smiles
+    }
+  })
+}
+
+export const deleteSmiles = (smilesFilePath: string, id: string) => {
+  return axios({
+    method: 'delete',
+    url: '/secse/delete_smiles',
+    params: {
+      smiles_file_path: smilesFilePath,
+      id: id
+    }
+  })
+}

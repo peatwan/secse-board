@@ -6,32 +6,53 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Tab,
-  Tabs,
   useDisclosure
 } from '@nextui-org/react'
 import { General } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ChooseModal from 'components/choose-modal/ChooseModal'
 import MoleculeEditor from 'components/molecule-editor/MoleculeEditor'
 import MoleculeViewer from 'components/molecule-viewer/MoleculeViewer'
+import { deleteSmiles, updateSmiles } from 'api/pages/new'
+import { toast } from 'sonner'
+import { getSmilesFromFile } from 'api/components/molecule-viewer'
 
 interface Props {
   general: General
   handleUpdate: <V>(path: AppConfigPaths, value: V) => void
 }
 
+export interface Smiles {
+  id: string
+  smiles: string
+}
+
+export type FragmentsViewModalMode = 'viewer' | 'editor'
+
 const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   const [isFragmentsFileModalOpen, setIsFragmentsFileModalOpen] =
     useState(false)
 
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+  const {
+    isOpen: isMoleculeViewModalOpen,
+    onOpen: onMoleculeViewModalOpen,
+    onOpenChange: onMoleculeViewModalOpenChange
+  } = useDisclosure()
 
-  const [fragmentsViewModalTabKeys, setFragmentsViewModalTabKeys] =
-    useState('view')
+  const [fragmentsViewModalMode, setFragmentsViewModalMode] =
+    useState<FragmentsViewModalMode>('viewer')
+  const [smilesList, setSmilesList] = useState<Smiles[]>([])
+  const [id4Edit, setId4Edit] = useState('')
+  const [smiles4Edit, setSmiles4Edit] = useState('')
 
-  const [smiles4Edit, setSmiles4Edit] = useState('c1ccccc1')
+  useEffect(() => {
+    if (isMoleculeViewModalOpen) {
+      loadSmiles(general.fragments)
+    } else {
+      setFragmentsViewModalMode('viewer')
+    }
+  }, [general.fragments, isMoleculeViewModalOpen])
 
   const handleFragmentsFileModalClose = () => {
     setIsFragmentsFileModalOpen(false)
@@ -41,13 +62,55 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
     handleUpdate('general.fragments', directory)
   }
 
-  const handleEditMolecule = (smiles: string) => {
-    setSmiles4Edit(smiles)
-    setFragmentsViewModalTabKeys('edit')
+  const loadSmiles = (smilesFilePath: string) => {
+    getSmilesFromFile(smilesFilePath)
+      .then((res) => {
+        setSmilesList(res.data)
+      })
+      .catch((e) => {
+        if (e.status === 400) {
+          toast.error(e.response.data.error)
+        } else {
+          toast.error(e.message)
+        }
+      })
   }
 
-  const handleSave = () => {
-    onClose()
+  const handleEditMolecule = (id: string, smiles: string) => {
+    setSmiles4Edit(smiles)
+    setId4Edit(id)
+    setFragmentsViewModalMode('editor')
+  }
+
+  const handleSaveEdit = (id: string, smiles: string) => {
+    updateSmiles(general.fragments, id, smiles)
+      .then((res) => {
+        toast.success(res.data.message)
+        setFragmentsViewModalMode('viewer')
+        loadSmiles(general.fragments)
+      })
+      .catch((e) => {
+        if (e.status === 400) {
+          toast.error(e.response.data.error)
+        } else {
+          toast.error(e.message)
+        }
+      })
+  }
+
+  const handleDeteleMolecule = (id: string) => {
+    deleteSmiles(general.fragments, id)
+      .then((res) => {
+        toast.success(res.data.message)
+        loadSmiles(general.fragments)
+      })
+      .catch((e) => {
+        if (e.status === 400) {
+          toast.error(e.response.data.error)
+        } else {
+          toast.error(e.message)
+        }
+      })
   }
 
   return (
@@ -101,7 +164,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
             color="secondary"
             variant="flat"
             onPress={() => {
-              onOpen()
+              onMoleculeViewModalOpen()
             }}
           >
             View
@@ -227,47 +290,56 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
         )}
       </div>
       <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
+        isOpen={isMoleculeViewModalOpen}
+        onOpenChange={onMoleculeViewModalOpenChange}
         size="4xl"
         classNames={{
-          body: 'min-h-[600px] max-h-[600px]'
+          body: 'min-h-[620px] max-h-[620px]',
+          closeButton: `${
+            fragmentsViewModalMode === 'editor' ? 'invisible' : ''
+          } `
         }}
         scrollBehavior="inside"
+        isDismissable={fragmentsViewModalMode === 'editor' ? false : true}
+        isKeyboardDismissDisabled={
+          fragmentsViewModalMode === 'editor' ? true : false
+        }
       >
         <ModalContent>
-          {(onClose) => (
+          {() => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Molecule Viewer
+                {fragmentsViewModalMode === 'viewer'
+                  ? 'Molecule Viewer'
+                  : 'Molecule Editor'}
               </ModalHeader>
               <ModalBody>
-                <Tabs
-                  selectedKey={fragmentsViewModalTabKeys}
-                  onSelectionChange={(key) => {
-                    setFragmentsViewModalTabKeys(key.toString())
-                  }}
-                  variant="underlined"
-                >
-                  <Tab key="view" title="View">
+                {fragmentsViewModalMode === 'viewer' && (
+                  <div
+                    className={`${
+                      fragmentsViewModalMode === 'viewer' ? '' : 'invisible'
+                    }`}
+                  >
                     <MoleculeViewer
-                      smilesFilePath={general.fragments}
-                      handleEdit={handleEditMolecule}
+                      smilesList={smilesList}
+                      onEdit={handleEditMolecule}
+                      onDelete={handleDeteleMolecule}
                     />
-                  </Tab>
-                  <Tab key="edit" title="Edit">
-                    <MoleculeEditor smiles={smiles4Edit} />
-                  </Tab>
-                </Tabs>
+                  </div>
+                )}
+
+                {fragmentsViewModalMode === 'editor' && (
+                  <MoleculeEditor
+                    smiles={smiles4Edit}
+                    id={id4Edit}
+                    onSaveEdit={handleSaveEdit}
+                    onModeChange={(mode) => {
+                      setFragmentsViewModalMode(mode)
+                    }}
+                  />
+                )}
               </ModalBody>
-              <ModalFooter>
-                <Button color="default" variant="flat" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" variant="flat" onPress={handleSave}>
-                  Save
-                </Button>
-              </ModalFooter>
+              <ModalFooter></ModalFooter>
             </>
           )}
         </ModalContent>

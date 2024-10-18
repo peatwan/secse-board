@@ -1,24 +1,30 @@
 import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow
+  TableRow,
+  Tooltip,
+  useDisclosure
 } from '@nextui-org/react'
-import { getSmilesFromFile } from 'api/components/molecule-viewer'
+import { DeleteIcon } from 'assets/icons/DeleteIcon'
+import { EditIcon } from 'assets/icons/EditIcon'
+import { EyeIcon } from 'assets/icons/EyeIcon'
 import MoleculeStructure from 'components/molecule-structure/MoleculeStructure'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { Smiles } from 'pages/new/GeneralParam'
+import { useCallback, useState } from 'react'
 
 interface Props {
-  smilesFilePath: string
-  handleEdit: (smiles: string) => void
-}
-
-interface Smiles {
-  id: string
-  smiles: string
+  smilesList: Smiles[]
+  onEdit: (id: string, smiles: string) => void
+  onDelete: (id: string) => void
 }
 
 const columns = [
@@ -28,52 +34,97 @@ const columns = [
   },
   {
     key: 'smiles',
-    label: 'Smiles'
+    label: 'SMILES'
   },
   {
     key: 'structure',
     label: 'Structure'
+  },
+  {
+    key: 'actions',
+    label: 'Actions'
   }
 ]
 
-const MoleculeViewer: React.FC<Props> = ({ smilesFilePath, handleEdit }) => {
-  const [items, setItems] = useState<Smiles[]>([])
-  const renderCell = useCallback((item: Smiles, columnKey: string) => {
-    const cellValue = item[columnKey as keyof Smiles]
-    switch (columnKey) {
-      case 'structure':
-        return (
-          <MoleculeStructure
-            id="structure-example-svg-aspirin"
-            structure={item.smiles}
-            width={100}
-            height={100}
-            svgMode
-          />
-        )
+const MoleculeViewer: React.FC<Props> = ({ smilesList, onEdit, onDelete }) => {
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onOpenChange: onDeleteModalOpenChange
+  } = useDisclosure()
 
-      default:
-        return cellValue
-    }
-  }, [])
-  useEffect(() => {
-    getSmilesFromFile(smilesFilePath)
-      .then((res) => {
-        setItems(res.data)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
-  }, [smilesFilePath])
+  const {
+    isOpen: isViewModalOpen,
+    onOpen: onViewModalOpen,
+    onOpenChange: onViewModalOpenChange
+  } = useDisclosure()
+
+  const [currentActionItem, setCurrentActionItem] = useState<Smiles>()
+
+  const renderCell = useCallback(
+    (item: Smiles, columnKey: string) => {
+      const cellValue = item[columnKey as keyof Smiles]
+      switch (columnKey) {
+        case 'structure':
+          return (
+            <div className="flex items-center justify-center">
+              <MoleculeStructure
+                structure={item.smiles}
+                width={100}
+                height={100}
+                svgMode
+              />
+            </div>
+          )
+        case 'actions':
+          return (
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="View">
+                <span
+                  className="cursor-pointer text-lg text-default-400 active:opacity-50"
+                  onClick={() => {
+                    setCurrentActionItem({ id: item.id, smiles: item.smiles })
+                    onViewModalOpen()
+                  }}
+                >
+                  <EyeIcon />
+                </span>
+              </Tooltip>
+              <Tooltip content="Edit">
+                <span
+                  className="cursor-pointer text-lg text-default-400 active:opacity-50"
+                  onClick={() => {
+                    onEdit(item.id, item.smiles)
+                  }}
+                >
+                  <EditIcon />
+                </span>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete">
+                <span
+                  className="cursor-pointer text-lg text-danger active:opacity-50"
+                  onClick={() => {
+                    setCurrentActionItem({ id: item.id, smiles: item.smiles })
+                    onDeleteModalOpen()
+                  }}
+                >
+                  <DeleteIcon />
+                </span>
+              </Tooltip>
+            </div>
+          )
+        default:
+          return cellValue
+      }
+    },
+    [onViewModalOpen, onEdit, onDeleteModalOpen]
+  )
+
   return (
     <div>
       <Table
         classNames={{
-          base: 'max-h-[500px]'
+          base: 'max-h-[600px]'
         }}
       >
         <TableHeader columns={columns}>
@@ -81,17 +132,78 @@ const MoleculeViewer: React.FC<Props> = ({ smilesFilePath, handleEdit }) => {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={items}>
+        <TableBody items={smilesList}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
-                // <TableCell>{getKeyValue(item, columnKey)}</TableCell>
                 <TableCell>{renderCell(item, String(columnKey))}</TableCell>
               )}
             </TableRow>
           )}
         </TableBody>
       </Table>
+      <Modal isOpen={isDeleteModalOpen} onOpenChange={onDeleteModalOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Warning</ModalHeader>
+              <ModalBody>
+                <p>
+                  Are you sure you want to <b>detele</b> the molecule{' '}
+                  <b>{currentActionItem?.id}</b>?
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="flat" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onPress={() => {
+                    if (currentActionItem) {
+                      onDelete(currentActionItem.id)
+                    }
+                    onClose()
+                  }}
+                >
+                  OK
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isViewModalOpen}
+        onOpenChange={onViewModalOpenChange}
+        size="3xl"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {currentActionItem?.id}
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex items-center justify-center rounded-lg border-2">
+                  <MoleculeStructure
+                    structure={currentActionItem?.smiles}
+                    width={600}
+                    height={600}
+                    svgMode
+                  />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   )
 }

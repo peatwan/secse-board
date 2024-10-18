@@ -275,6 +275,81 @@ def get_smiles_from_file():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/secse/update_smiles", methods=["POST"])
+def update_smiles():
+    # Get args from request data
+    smiles_file_path = request.json.get("smiles_file_path")
+    id = request.json.get("id")
+    smiles = request.json.get("smiles")
+
+    molecules = []
+
+    with open(smiles_file_path, "r") as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                parts = line.split()
+                molecule = {
+                    "smiles": parts[0],  # SMILES string
+                    "id": parts[1],  # Molecule ID
+                }
+                molecules.append(molecule)
+
+    # Updates the SMILES string of a molecule by id.
+    for molecule in molecules:
+        if molecule["id"] == id:
+            molecule["smiles"] = smiles
+            # Saves the updated list of molecules back to the .smi file.
+            with open(smiles_file_path, "w") as file:
+                for molecule in molecules:
+                    file.write(f"{molecule['smiles']} {molecule['id']}\n")
+
+            logger.info(f"Updated {id} to new SMILES: {smiles}")
+            return (
+                jsonify({"message": "Modification saved successfully"}),
+                200,
+            )
+
+    logger.error(f"ID {id} not found.")
+    return jsonify({"error": "Modification fail to save!"}), 400
+
+
+@app.route("/secse/delete_smiles", methods=["DELETE"])
+def delete_smiles():
+    # Get args from request data
+    smiles_file_path = request.args.get("smiles_file_path")
+    id = request.args.get("id")
+
+    molecules = []
+    with open(smiles_file_path, "r") as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                parts = line.split()
+                molecule = {
+                    "smiles": parts[0],  # SMILES string
+                    "id": parts[1],  # Molecule ID
+                }
+                molecules.append(molecule)
+
+    # Delete molecule by id
+    updated_molecules = [molecule for molecule in molecules if molecule["id"] != id]
+
+    if len(updated_molecules) < len(molecules):
+        # Saves the updated list of molecules back to the .smi file.
+        with open(smiles_file_path, "w") as file:
+            for molecule in updated_molecules:
+                file.write(f"{molecule['smiles']} {molecule['id']}\n")
+        logger.info(f"Delete {id} in {smiles_file_path}")
+        return (
+            jsonify({"message": f"Delete molecule {id} successfully"}),
+            200,
+        )
+    else:
+        logger.error(f"ID {id} not found.")
+        return jsonify({"error": "Modification fail to save!"}), 400
+
+
 if __name__ == "__main__":
     # logger configuration
     logger.configure(
