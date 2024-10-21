@@ -10,7 +10,6 @@ from utils.strutil import (
     convert_dict_from_camel_to_snake_case,
 )
 from utils.config import Config, ConfigError
-import json
 
 app = Flask(__name__)
 
@@ -375,4 +374,4 @@ if __name__ == "__main__":
         ],
     )
 
-    app.run(debug=True)
+    app.run()
