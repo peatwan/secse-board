@@ -26,6 +26,7 @@ const initRDKit = (() => {
      */
     if (!rdkitLoadingPromise) {
       rdkitLoadingPromise = new Promise((resolve, reject) => {
+        //@ts-expect-error initRDKitModule is from RDKit_minimal.js
         initRDKitModule()
           .then((RDKit: any) => {
             window.RDKit = RDKit
