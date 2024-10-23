@@ -1,12 +1,255 @@
+import {
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure
+} from '@nextui-org/react'
+import {
+  getProjectStatus,
+  pauseProject,
+  resumeProject,
+  startProject
+} from 'api/pages/monitor'
+import { getDefaultDirectory } from 'api/pages/new'
+import { CancelIcon } from 'assets/icons/CancelIcon'
+import { CheckCircleIcon } from 'assets/icons/CheckCircleIcon'
+import { ErrorIcon } from 'assets/icons/ErrorIcon'
+import { PauseCircleIcon } from 'assets/icons/PauseCircileIcon'
+import { PlayCircleIcon } from 'assets/icons/PlayCircleIcon'
+import ChooseModal from 'components/choose-modal/ChooseModal'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
 
 const Monitor = () => {
-  const { path: projectPath, status: projectCreated } = useProjectStore()
+  const {
+    path: projectPath,
+    status: projectStatus,
+    setPath: setProjectPath,
+    setStatus: setProjectStatus
+  } = useProjectStore()
+
+  const [isProjectPathChooseModalOpen, setIsProjectPathChooseModalOpen] =
+    useState(false)
+  const [choosePath, setChoosePath] = useState('')
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+
+  useEffect(() => {
+    if (projectPath) {
+      setChoosePath(projectPath)
+      getProjectStatus(projectPath)
+        .then((res) => {
+          setProjectStatus(res.data.status)
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+          setProjectStatus('NotCreated')
+        })
+    } else {
+      getDefaultDirectory().then((res) => {
+        setChoosePath(res.data)
+      })
+    }
+  }, [projectPath, setProjectStatus])
+
+  const handleProjectPathChooseModalClose = () => {
+    setIsProjectPathChooseModalOpen(false)
+  }
+  const handleProjectPathChooseSave = (directory: string) => {
+    setChoosePath(directory)
+    setProjectPath(directory)
+  }
+
+  const handleClickStatusButton = () => {
+    if (
+      projectStatus === 'Created' ||
+      projectStatus === 'Running' ||
+      projectStatus === 'Paused'
+    ) {
+      onOpen()
+    }
+  }
+
+  const handleStatusChange = () => {
+    if (projectStatus === 'Created') {
+      startProject(projectPath)
+        .then(() => {
+          setProjectStatus('Running')
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+        })
+    } else if (projectStatus === 'Running') {
+      pauseProject(projectPath)
+        .then(() => {
+          setProjectStatus('Paused')
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+        })
+    } else if (projectStatus === 'Paused') {
+      resumeProject(projectPath)
+        .then(() => {
+          setProjectStatus('Running')
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+        })
+    }
+    onClose()
+  }
+
+  const statusButtonStartContent = () => {
+    switch (projectStatus) {
+      case 'NotCreated':
+        return <CancelIcon fill="#000000" />
+      case 'Created':
+      case 'Paused':
+        return <PlayCircleIcon fill="#fafafa" />
+      case 'Running':
+        return <PauseCircleIcon fill="#fafafa" />
+      case 'Finished':
+        return <CheckCircleIcon fill="#000000" />
+      case 'Failed':
+        return <ErrorIcon fill="#fafafa" />
+      default:
+        return <div></div>
+    }
+  }
+
+  const statusButtonColor = () => {
+    switch (projectStatus) {
+      case 'NotCreated':
+        return 'default'
+      case 'Created':
+      case 'Paused':
+      case 'Running':
+        return 'primary'
+      case 'Finished':
+        return 'success'
+      case 'Failed':
+        return 'danger'
+      default:
+        return 'primary'
+    }
+  }
+
+  const getModalText = () => {
+    if (projectStatus === 'Created') {
+      return (
+        <span>
+          <b>start</b> running
+        </span>
+      )
+    } else if (projectStatus === 'Running') {
+      return (
+        <span>
+          <b>pause</b> the running job
+        </span>
+      )
+    } else if (projectStatus === 'Paused') {
+      return (
+        <span>
+          <b>resume</b> the pasued job
+        </span>
+      )
+    }
+  }
 
   return (
     <div>
-      <span>path: {projectPath}</span>
-      <span>created: {projectCreated}</span>
+      <div className="space-y-12 pt-10">
+        <div className="flex flex-col items-start justify-start gap-10">
+          <div className="flex items-center justify-start gap-5">
+            <div className="text-xl font-semibold leading-7 text-gray-900">
+              Project:
+            </div>
+            <Input
+              value={choosePath}
+              readOnly
+              classNames={{
+                input: ['w-[300px]']
+              }}
+              onValueChange={setChoosePath}
+            ></Input>
+            <Button
+              color="primary"
+              variant="flat"
+              onPress={() => setIsProjectPathChooseModalOpen(true)}
+            >
+              Choose
+            </Button>
+          </div>
+          <div className="flex items-center justify-start gap-5">
+            <div className=" text-xl font-semibold leading-7 text-gray-900">
+              Status:
+            </div>
+            <Button
+              size="lg"
+              color={statusButtonColor()}
+              radius="full"
+              startContent={statusButtonStartContent()}
+              onPress={handleClickStatusButton}
+              className="w-48 justify-start text-xl"
+            >
+              {projectStatus}
+            </Button>
+          </div>
+        </div>
+        <div className="border-b border-gray-900/10"></div>
+      </div>
+      <div>
+        {isProjectPathChooseModalOpen && (
+          <ChooseModal
+            currentDirectory={choosePath}
+            mode="folder"
+            enableFolderCreation={false}
+            isModalOpen={isProjectPathChooseModalOpen}
+            handleClose={handleProjectPathChooseModalClose}
+            onSave={handleProjectPathChooseSave}
+          ></ChooseModal>
+        )}
+      </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Info</ModalHeader>
+              <ModalBody>
+                <p>Are you sure to {getModalText()}?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button color="primary" onPress={handleStatusChange}>
+                  OK
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   )
 }

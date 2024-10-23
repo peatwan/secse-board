@@ -4,14 +4,33 @@ from datetime import datetime
 from loguru import logger
 from loguru._defaults import LOGURU_FORMAT
 import shutil
-from utils.path import get_user_directory
+from utils.file import get_user_directory, read_status, save_status
 from utils.strutil import (
     convert_dict_from_snake_to_camel_case,
     convert_dict_from_camel_to_snake_case,
 )
 from utils.config import Config, ConfigError
+import logging
 
 app = Flask(__name__)
+
+
+# costum logger handler
+class InterceptHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
+
+        frame, depth = logging.currentframe(), 2
+        while frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
+
+        logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
 
 
 # Root route with /secse in the path
@@ -159,6 +178,9 @@ def create_project():
 
         # Save changes to the configuration file
         config.save()
+
+        # Write project status file
+        save_status(new_project_path, "Created", project_code)
 
         return (
             jsonify(
@@ -360,6 +382,65 @@ def delete_smiles():
         return jsonify({"error": "Molecule {id} not found"}), 400
 
 
+# Get project status
+@app.route("/secse/get_project_status", methods=["GET"])
+def get_project_status():
+    # Get args from request data
+    path = request.args.get("path")
+    status = read_status(path)
+    if not status:
+        return jsonify({"error": "Cannot get project status"}), 400
+    return jsonify(status), 200
+
+
+@app.route("/secse/start", methods=["POST"])
+def start():
+    # Get args from request data
+    path = request.json.get("path")
+    status = read_status(path)
+    if not status:
+        return jsonify({"error": "Cannot get project status"}), 400
+    if status["status"] != "Created":
+        return jsonify({"error": "Only created project can be started"}), 400
+
+    # todo start running script
+    save_status(path, "Running", status["project_code"])
+    logger.info(f"Start project {path} successfully")
+    return jsonify({"message": "Start running successfully"}), 200
+
+
+@app.route("/secse/pause", methods=["POST"])
+def pause():
+    # Get args from request data
+    path = request.json.get("path")
+    status = read_status(path)
+    if not status:
+        return jsonify({"error": "Cannot get project status"}), 400
+    if status["status"] != "Running":
+        return jsonify({"error": "Only running project can be started"}), 400
+
+    # todo start running script
+    save_status(path, "Paused", status["project_code"])
+    logger.info(f"Pause project {path} successfully")
+    return jsonify({"message": "Pause successfully"}), 200
+
+
+@app.route("/secse/resume", methods=["POST"])
+def resume():
+    # Get args from request data
+    path = request.json.get("path")
+    status = read_status(path)
+    if not status:
+        return jsonify({"error": "Cannot get project status"}), 400
+    if status["status"] != "Paused":
+        return jsonify({"error": "Only paused project can be started"}), 400
+
+    # todo start running script
+    save_status(path, "Running", status["project_code"])
+    logger.info(f"Resume project {path} successfully")
+    return jsonify({"message": "Resume successfully"}), 200
+
+
 if __name__ == "__main__":
     # logger configuration
     logger.configure(
@@ -373,5 +454,7 @@ if __name__ == "__main__":
             }
         ],
     )
+    # register loguru as handler
+    app.logger.addHandler(InterceptHandler())
 
-    app.run()
+    app.run(debug=True)

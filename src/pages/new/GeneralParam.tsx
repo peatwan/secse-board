@@ -292,6 +292,7 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
           <ChooseModal
             currentDirectory={general.fragments}
             mode="file"
+            enableFolderCreation={false}
             isModalOpen={isFragmentsFileModalOpen}
             handleClose={handleFragmentsFileModalClose}
             onSave={handleFragmentsFileSave}

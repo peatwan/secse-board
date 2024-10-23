@@ -1,7 +1,6 @@
 import { Button, Input, Select, SelectItem } from '@nextui-org/react'
-import { useProjectStore } from 'utils/store'
 import SmoothCollapse from 'react-smooth-collapse'
-import { Docking, DockingProgram } from './types/appConfig'
+import { Docking } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
 import { useState } from 'react'
 import ChooseModal from 'components/choose-modal/ChooseModal'
@@ -19,8 +18,6 @@ const dockingPrograms = [
 ]
 
 const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
-  const { dockingProgram } = useProjectStore()
-  const { setDockingProgram } = useProjectStore()
   const [isTargetFileModalOpen, setIsTargetFileModalOpen] = useState(false)
   const handleTargetFileModalClose = () => {
     setIsTargetFileModalOpen(false)
@@ -41,9 +38,6 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
             onSelectionChange={(keys) => {
               const value = keys.currentKey
               handleUpdate('docking.dockingProgram', value ? value : 'vina')
-              setDockingProgram(
-                value ? (value as DockingProgram) : ('vina' as DockingProgram)
-              )
             }}
           >
             {dockingPrograms.map((item) => (
@@ -72,7 +66,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           </Button>
         </div>
         <div className="gap-3 sm:col-span-6">
-          <SmoothCollapse expanded={dockingProgram === 'vina'}>
+          <SmoothCollapse expanded={docking.dockingProgram === 'vina'}>
             <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="gap-3 sm:col-span-6">
                 <span className="text-lg font-medium leading-7 text-gray-900 ">
@@ -227,6 +221,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           <ChooseModal
             currentDirectory={docking.target}
             mode="file"
+            enableFolderCreation={false}
             isModalOpen={isTargetFileModalOpen}
             handleClose={handleTargetFileModalClose}
             onSave={handleTargetFileSave}

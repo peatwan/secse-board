@@ -37,7 +37,7 @@ export const saveConfig = (directory: string, appConfig: AppConfig) => {
 }
 
 export const getDefaultDirectory = () => {
-  return axios({
+  return axios<string>({
     method: 'get',
     url: '/secse/get_default_directory'
   })

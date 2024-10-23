@@ -95,6 +95,7 @@ const New = () => {
             <ChooseModal
               currentDirectory={workingDirectory}
               mode="folder"
+              enableFolderCreation
               isModalOpen={isWorkingDirectoryModalOpen}
               handleClose={handleWorkingDirectoryModalClose}
               onSave={handleWorkingDirectorySave}

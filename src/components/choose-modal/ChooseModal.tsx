@@ -26,6 +26,7 @@ interface Props {
   currentDirectory: string
   mode: 'file' | 'folder'
   isModalOpen: boolean
+  enableFolderCreation: boolean
   handleClose: () => void
   onSave: (directory: string) => void
 }
@@ -61,6 +62,7 @@ const ChooseModal: React.FC<Props> = ({
   currentDirectory,
   mode,
   isModalOpen,
+  enableFolderCreation,
   handleClose,
   onSave
 }) => {
@@ -225,7 +227,7 @@ const ChooseModal: React.FC<Props> = ({
             <ArrowBackIcon />
           </Button>
 
-          {mode === 'folder' && (
+          {enableFolderCreation && (
             <Button isIconOnly color="default" onPress={createNewFolder}>
               <CreateNewFolderIcon />
             </Button>
@@ -259,7 +261,6 @@ const ChooseModal: React.FC<Props> = ({
             {(item) => (
               <TableRow key={item.name}>
                 {(columnKey) => (
-                  // <TableCell>{getKeyValue(item, columnKey)}</TableCell>
                   <TableCell>{renderCell(item, String(columnKey))}</TableCell>
                 )}
               </TableRow>
