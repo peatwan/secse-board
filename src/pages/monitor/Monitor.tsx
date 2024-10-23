@@ -37,6 +37,7 @@ const Monitor = () => {
     useState(false)
   const [choosePath, setChoosePath] = useState('')
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (projectPath) {
@@ -80,6 +81,7 @@ const Monitor = () => {
 
   const handleStatusChange = () => {
     if (projectStatus === 'Created') {
+      setIsLoading(true)
       startProject(projectPath)
         .then(() => {
           setProjectStatus('Running')
@@ -91,7 +93,11 @@ const Monitor = () => {
             toast.error(e.message)
           }
         })
+        .finally(() => {
+          setIsLoading(false)
+        })
     } else if (projectStatus === 'Running') {
+      setIsLoading(true)
       pauseProject(projectPath)
         .then(() => {
           setProjectStatus('Paused')
@@ -103,7 +109,11 @@ const Monitor = () => {
             toast.error(e.message)
           }
         })
+        .finally(() => {
+          setIsLoading(false)
+        })
     } else if (projectStatus === 'Paused') {
+      setIsLoading(true)
       resumeProject(projectPath)
         .then(() => {
           setProjectStatus('Running')
@@ -115,11 +125,17 @@ const Monitor = () => {
             toast.error(e.message)
           }
         })
+        .finally(() => {
+          setIsLoading(false)
+        })
     }
     onClose()
   }
 
   const statusButtonStartContent = () => {
+    if (isLoading) {
+      return null
+    }
     switch (projectStatus) {
       case 'NotCreated':
         return <CancelIcon fill="#000000" />
@@ -133,7 +149,7 @@ const Monitor = () => {
       case 'Failed':
         return <ErrorIcon fill="#fafafa" />
       default:
-        return <div></div>
+        return null
     }
   }
 
@@ -205,6 +221,7 @@ const Monitor = () => {
               Status:
             </div>
             <Button
+              isLoading={isLoading}
               size="lg"
               color={statusButtonColor()}
               radius="full"
