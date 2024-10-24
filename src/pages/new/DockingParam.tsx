@@ -27,7 +27,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
   }
   return (
     <div>
-      <span className="text-xl font-semibold leading-7 text-gray-900">
+      <span className="text-2xl font-semibold leading-7 text-gray-900">
         Docking
       </span>
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -69,7 +69,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           <SmoothCollapse expanded={docking.dockingProgram === 'vina'}>
             <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="gap-3 sm:col-span-6">
-                <span className="text-lg font-medium leading-7 text-gray-900 ">
+                <span className="text-xl font-medium leading-7 text-gray-900 ">
                   Docking Box
                 </span>
               </div>
@@ -167,7 +167,7 @@ const DockingParam: React.FC<Props> = ({ docking, handleUpdate }) => {
           </SmoothCollapse>
         </div>
         <div className="gap-3 sm:col-span-6">
-          <span className="text-lg font-medium leading-7 text-gray-900 ">
+          <span className="text-xl font-medium leading-7 text-gray-900 ">
             Optimization Direction
           </span>
         </div>

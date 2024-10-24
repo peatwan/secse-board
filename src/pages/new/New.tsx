@@ -51,7 +51,7 @@ const New = () => {
   return (
     <div className="flex items-center justify-center">
       <div className="py-6">
-        <span className="text-xl font-semibold leading-7 text-gray-900">
+        <span className="text-2xl font-semibold leading-7 text-gray-900">
           New Project
         </span>
         <div className="mt-5 grid grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-6">
