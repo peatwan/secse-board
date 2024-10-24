@@ -71,8 +71,8 @@ const MoleculeViewer: React.FC<Props> = ({ smilesList, onEdit, onDelete }) => {
             <div className="flex items-center justify-center">
               <MoleculeStructure
                 structure={item.smiles}
-                width={100}
-                height={100}
+                width={150}
+                height={150}
                 svgMode
               />
             </div>
@@ -141,7 +141,8 @@ const MoleculeViewer: React.FC<Props> = ({ smilesList, onEdit, onDelete }) => {
       <Table
         topContent={topContent}
         classNames={{
-          base: 'max-h-[600px]'
+          base: 'max-h-[600px]',
+          td: 'break-words'
         }}
       >
         <TableHeader columns={columns}>
