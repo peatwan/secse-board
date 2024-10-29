@@ -24,6 +24,9 @@ import ChooseModal from 'components/choose-modal/ChooseModal'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
+import Overview from './Overview'
+import Stats from './Stats'
+import GenDetails from './GenDetails'
 
 const Monitor = () => {
   const {
@@ -195,45 +198,55 @@ const Monitor = () => {
   return (
     <div>
       <div className="space-y-12 pt-10">
-        <div className="flex flex-col items-start justify-start gap-10">
-          <div className="flex items-center justify-start gap-5">
-            <div className="text-xl font-semibold leading-7 text-gray-900">
-              Project:
+        <div className="border-b border-gray-900/10 pb-10">
+          <div className="flex flex-col items-start justify-start gap-10">
+            <div className="flex items-center justify-start gap-5">
+              <div className="text-xl font-semibold leading-7 text-gray-900">
+                Project:
+              </div>
+              <Input
+                value={choosePath}
+                readOnly
+                classNames={{
+                  input: ['w-[300px]']
+                }}
+                onValueChange={setChoosePath}
+              ></Input>
+              <Button
+                color="primary"
+                variant="flat"
+                onPress={() => setIsProjectPathChooseModalOpen(true)}
+              >
+                Choose
+              </Button>
             </div>
-            <Input
-              value={choosePath}
-              readOnly
-              classNames={{
-                input: ['w-[300px]']
-              }}
-              onValueChange={setChoosePath}
-            ></Input>
-            <Button
-              color="primary"
-              variant="flat"
-              onPress={() => setIsProjectPathChooseModalOpen(true)}
-            >
-              Choose
-            </Button>
-          </div>
-          <div className="flex items-center justify-start gap-5">
-            <div className=" text-xl font-semibold leading-7 text-gray-900">
-              Status:
+            <div className="flex items-center justify-start gap-5">
+              <div className=" text-xl font-semibold leading-7 text-gray-900">
+                Status:
+              </div>
+              <Button
+                isLoading={isLoading}
+                size="lg"
+                color={statusButtonColor()}
+                radius="full"
+                startContent={statusButtonStartContent()}
+                onPress={handleClickStatusButton}
+                className="w-48 justify-start text-xl"
+              >
+                {projectStatus}
+              </Button>
             </div>
-            <Button
-              isLoading={isLoading}
-              size="lg"
-              color={statusButtonColor()}
-              radius="full"
-              startContent={statusButtonStartContent()}
-              onPress={handleClickStatusButton}
-              className="w-48 justify-start text-xl"
-            >
-              {projectStatus}
-            </Button>
           </div>
         </div>
-        <div className="border-b border-gray-900/10"></div>
+        <div className="border-b border-gray-900/10 pb-10">
+          <Overview />
+        </div>
+        <div className="border-b border-gray-900/10 pb-10">
+          <Stats />
+        </div>
+        <div className="border-b border-gray-900/10 pb-10">
+          <GenDetails />
+        </div>
       </div>
       <div>
         {isProjectPathChooseModalOpen && (

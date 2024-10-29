@@ -141,7 +141,6 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
             className="flex min-w-full items-center justify-center rounded-lg  py-1 hover:bg-default-100"
             onClick={() => setIsShowMore(true)}
           >
-            {/* <img src="/arrow_down.svg" className="size-6 "></img> */}
             <div className="size-6">
               <ArrowDownIcon />
             </div>
@@ -367,7 +366,6 @@ const PropertiesParam: React.FC<Props> = ({ properties, handleUpdate }) => {
               className="flex min-w-full items-center justify-center rounded-lg  py-0.5 hover:bg-default-100"
               onClick={() => setIsShowMore(false)}
             >
-              {/* <img src="/arrow_up.svg" className="size-6"></img> */}
               <div className="size-6">
                 <ArrowUpIcon />
               </div>
