@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "api": "cd backend && /opt/anaconda3/envs/flask/bin/python app.py",
+    "api": "cd backend && /opt/anaconda3/envs/flask/bin/python run.py",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "lint": "eslint src --max-warnings=0",

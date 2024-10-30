@@ -1,135 +1,24 @@
 import re
-from flask import Flask, jsonify, request
+import shutil
+from flask import Blueprint, jsonify, request
 import os
 from datetime import datetime
+
 from loguru import logger
-from loguru._defaults import LOGURU_FORMAT
-import shutil
-from utils.file import get_user_directory, read_status, save_status
-from utils.strutil import (
-    convert_dict_from_snake_to_camel_case,
-    convert_dict_from_camel_to_snake_case,
-)
-from utils.config import Config, ConfigError
-import logging
 import pandas as pd
 
-app = Flask(__name__)
+from app.utils.config import Config, ConfigError
+from app.utils.strutil import (
+    convert_dict_from_camel_to_snake_case,
+    convert_dict_from_snake_to_camel_case,
+)
+from app.utils.file import get_user_directory, read_status, save_status
 
-
-# costum logger handler
-class InterceptHandler(logging.Handler):
-    def emit(self, record):
-        try:
-            level = logger.level(record.levelname).name
-        except ValueError:
-            level = record.levelno
-
-        frame, depth = logging.currentframe(), 2
-        while frame.f_code.co_filename == logging.__file__:
-            frame = frame.f_back
-            depth += 1
-
-        logger.opt(depth=depth, exception=record.exc_info).log(
-            level, record.getMessage()
-        )
-
-
-# Root route with /secse in the path
-@app.route("/secse", methods=["GET"])
-def index():
-    return "Welcome to the SECSE API!", 200
-
-
-# Route to list all files and folders in a directory
-@app.route("/secse/list_directory", methods=["GET"])
-def list_directory():
-    # Get directory path from request arguments
-    directory = request.args.get("directory")
-
-    # Get directory if it is a file
-    if os.path.isfile(directory):
-        index = directory.rfind("/")
-        directory = directory[:index]
-
-    # Validate if directory is provided and exists
-    if not directory or not os.path.exists(directory):
-        return jsonify({"error": "Directory not provided or does not exist"}), 400
-
-    # Prepare the response
-    itemsInfo = []
-
-    # Get list of items in the provided directory
-    for item in os.listdir(directory):
-        itemPath = os.path.join(directory, item)
-        # Get last modified time
-        lastModifiedTime = os.path.getmtime(itemPath)
-        lastModifiedTimeReadable = datetime.fromtimestamp(lastModifiedTime).isoformat()
-
-        # Check if the item is a file or directory and append relevant info
-        if os.path.isdir(itemPath):
-            itemsInfo.append(
-                {
-                    "name": item,
-                    "type": "folder",
-                    "lastModified": lastModifiedTimeReadable,
-                    "size": "-",  # Size is not applicable for directories
-                }
-            )
-        elif os.path.isfile(itemPath):
-            itemsInfo.append(
-                {
-                    "name": item,
-                    "type": "file",
-                    "lastModified": lastModifiedTimeReadable,
-                    "size": os.path.getsize(itemPath),  # Get size for files
-                }
-            )
-
-    return jsonify(itemsInfo), 200
-
-
-# Route to create a new folder
-@app.route("/secse/create_folder", methods=["POST"])
-def create_folder():
-    # Get directory and folder name from request data
-    directory = request.json.get("directory")
-    folder_name = request.json.get("folder_name")
-
-    # Validate that directory and folder_name are provided
-    if not directory or not folder_name:
-        return jsonify({"error": "Directory and folder name must be provided"}), 400
-
-    # Get directory if it is a file
-    if os.path.isfile(directory):
-        index = directory.rfind("/")
-        directory = directory[:index]
-
-    # Validate that the directory exists
-    if not os.path.exists(directory):
-        return jsonify({"error": "Directory does not exist"}), 400
-
-    # Construct the full path for the new folder
-    new_folder_path = os.path.join(directory, folder_name)
-
-    # Check if the folder already exists
-    if os.path.exists(new_folder_path):
-        return jsonify({"error": "Folder already exists"}), 400
-
-    # Try to create the folder
-    try:
-        os.makedirs(new_folder_path)
-        return (
-            jsonify({"message": "Folder created successfully", "folder": folder_name}),
-            201,
-        )
-    except Exception as e:
-        logger.error(e)
-        return jsonify({"error": str(e)}), 500
+bp = Blueprint("project_routes", __name__)
 
 
 # Create a new project
-@app.route("/secse/create_project", methods=["POST"])
+@bp.route("/secse/create_project", methods=["POST"])
 def create_project():
     # Get args from request data
     workingDirectory = request.json.get("workingDirectory")
@@ -208,7 +97,7 @@ def create_project():
 
 
 # Get config
-@app.route("/secse/get_config", methods=["GET"])
+@bp.route("/secse/get_config", methods=["GET"])
 def get_config():
     # Get directory path from request arguments
     directory = request.args.get("directory")
@@ -234,7 +123,7 @@ def get_config():
 
 
 # Save config
-@app.route("/secse/save_config", methods=["POST"])
+@bp.route("/secse/save_config", methods=["POST"])
 def save_config():
     # Get directory path from request arguments
     directory = request.json.get("directory")
@@ -272,13 +161,7 @@ def save_config():
         return jsonify({"error": str(e)}), 500
 
 
-# Get default directory
-@app.route("/secse/get_default_directory", methods=["GET"])
-def get_default_directory():
-    return jsonify(get_user_directory()), 200
-
-
-@app.route("/secse/get_smiles_from_file", methods=["GET"])
+@bp.route("/secse/get_smiles_from_file", methods=["GET"])
 def get_smiles_from_file():
     smiles_file_path = request.args.get("smiles_file_path")
     # Validate if directory is provided and exists
@@ -305,7 +188,7 @@ def get_smiles_from_file():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/secse/update_smiles", methods=["POST"])
+@bp.route("/secse/update_smiles", methods=["POST"])
 def update_smiles():
     # Get args from request data
     smiles_file_path = request.json.get("smiles_file_path")
@@ -355,7 +238,7 @@ def update_smiles():
     return jsonify({"message": f"New molecule {id} added successfully"}), 200
 
 
-@app.route("/secse/delete_smiles", methods=["DELETE"])
+@bp.route("/secse/delete_smiles", methods=["DELETE"])
 def delete_smiles():
     # Get args from request data
     smiles_file_path = request.args.get("smiles_file_path")
@@ -392,7 +275,7 @@ def delete_smiles():
 
 
 # Get project status
-@app.route("/secse/get_project_status", methods=["GET"])
+@bp.route("/secse/get_project_status", methods=["GET"])
 def get_project_status():
     # Get args from request data
     path = request.args.get("path")
@@ -405,105 +288,7 @@ def get_project_status():
     return jsonify(status), 200
 
 
-@app.route("/secse/start", methods=["POST"])
-def start():
-    # Get args from request data
-    path = request.json.get("path")
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
-
-    statusData = read_status(path)
-    if not statusData:
-        return jsonify({"error": "Cannot get project status"}), 400
-    if statusData["status"] != "Created":
-        return jsonify({"error": "Only created project can be started"}), 400
-
-    config_file = os.path.join(path, "config.ini")
-
-    # Retrieve all options
-    try:
-        config = Config(config_file)
-    except ConfigError as e:
-        return jsonify({"error": "Fail to load config file!"}), 400
-    except Exception as e:
-        logger.error(e)
-        return jsonify({"error": str(e)}), 500
-
-    # todo start running script
-    statusData["status"] = "Running"
-    statusData["generation"]["total"] = config.general.num_gen
-    currentTime = datetime.now().isoformat()
-    statusData["start_time"] = currentTime
-    statusData["update_time"] = currentTime
-    save_status(path, statusData)
-    logger.info(f"Start project {path} successfully")
-    return jsonify({"message": "Start running successfully"}), 200
-
-
-@app.route("/secse/stop", methods=["POST"])
-def stop():
-    # Get args from request data
-    path = request.json.get("path")
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
-
-    statusData = read_status(path)
-    if not statusData:
-        return jsonify({"error": "Cannot get project status"}), 400
-    if statusData["status"] != "Running":
-        return jsonify({"error": "Only running project can be stopped"}), 400
-
-    # todo stop job script
-    statusData["status"] = "Stopped"
-    statusData["update_time"] = datetime.now().isoformat()
-    save_status(path, statusData)
-    logger.info(f"Stop project {path} successfully")
-    return jsonify({"message": "Stop successfully"}), 200
-
-
-@app.route("/secse/pause", methods=["POST"])
-def pause():
-    # Get args from request data
-    path = request.json.get("path")
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
-
-    statusData = read_status(path)
-    if not statusData:
-        return jsonify({"error": "Cannot get project status"}), 400
-    if statusData["status"] != "Running":
-        return jsonify({"error": "Only running project can be paused"}), 400
-
-    # todo pause job script
-    statusData["status"] = "Paused"
-    statusData["update_time"] = datetime.now().isoformat()
-    save_status(path, statusData)
-    logger.info(f"Pause project {path} successfully")
-    return jsonify({"message": "Pause successfully"}), 200
-
-
-@app.route("/secse/resume", methods=["POST"])
-def resume():
-    # Get args from request data
-    path = request.json.get("path")
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
-
-    statusData = read_status(path)
-    if not statusData:
-        return jsonify({"error": "Cannot get project status"}), 400
-    if statusData["status"] != "Paused":
-        return jsonify({"error": "Only paused project can be started"}), 400
-
-    # todo resume job script
-    statusData["status"] = "Running"
-    statusData["update_time"] = datetime.now().isoformat()
-    save_status(path, statusData)
-    logger.info(f"Resume project {path} successfully")
-    return jsonify({"message": "Resume successfully"}), 200
-
-
-@app.route("/secse/get_scores", methods=["Get"])
+@bp.route("/secse/get_scores", methods=["Get"])
 def get_scores():
     # Get args from request data
     path = request.args.get("path")
@@ -537,22 +322,3 @@ def get_scores():
         result["scoreCutoff"].append(cutoff_scores[i])
 
     return jsonify(result), 200
-
-
-if __name__ == "__main__":
-    # logger configuration
-    logger.configure(
-        handlers=[
-            {
-                "sink": "logs/app_{time:YYYYMMDD}.log",
-                "rotation": "00:00",
-                "encoding": "utf-8",
-                "format": LOGURU_FORMAT,
-                "level": "INFO",
-            }
-        ],
-    )
-    # register loguru as handler
-    app.logger.addHandler(InterceptHandler())
-
-    app.run(debug=True)
