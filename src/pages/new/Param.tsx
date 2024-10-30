@@ -45,7 +45,6 @@ const Param = () => {
   }
 
   const handleSave = () => {
-    console.log(appConfig)
     saveConfig(path, appConfig)
       .then((res) => {
         toast.success(res.data.message)
