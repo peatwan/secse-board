@@ -7,3 +7,8 @@ export interface ProjectStatus {
   update_time: string
   generation: { current: number; total: number }
 }
+
+export interface Scores {
+  dockingScore: number[]
+  scoreCutoff: number[]
+}

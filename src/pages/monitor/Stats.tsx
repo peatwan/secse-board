@@ -1,11 +1,85 @@
+import { getScores } from 'api/pages/monitor'
 import {
   ReactECharts,
   ReactEChartsProps
 } from 'components/react-echarts/ReactECharts'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { useProjectStore } from 'utils/store'
 
 const Stats = () => {
-  const optionStatsChart: ReactEChartsProps['option'] = {
-    legend: {},
+  const { path: projectPath } = useProjectStore()
+  const [dockingScoreList, setDockingScoreList] = useState<number[]>([])
+  const [scoreCutoffList, setScoreCutoffList] = useState<number[]>([])
+
+  useEffect(() => {
+    if (projectPath) {
+      getScores(projectPath)
+        .then((res) => {
+          setDockingScoreList(res.data.dockingScore)
+          setScoreCutoffList(res.data.scoreCutoff)
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+        })
+    }
+  }, [projectPath])
+
+  const genXAxisLabels = (n: number) => {
+    const arr = []
+    for (let i = 1; i <= n; i++) {
+      const text = 'Gen_' + i
+      arr.push(text)
+    }
+    return arr
+  }
+
+  const optionDockingScore: ReactEChartsProps['option'] = {
+    title: {
+      text: 'Scores'
+    },
+    legend: {
+      right: '10%'
+    },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (value) => (value ? Number(value).toFixed(4) : '-')
+    },
+    xAxis: {
+      type: 'category',
+      axisLine: {
+        onZero: false
+      },
+
+      data: genXAxisLabels(dockingScoreList.length)
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [
+      {
+        data: dockingScoreList,
+        type: 'line',
+        name: 'Docking Score'
+      },
+      {
+        data: scoreCutoffList,
+        type: 'line',
+        name: 'Score Cutoff'
+      }
+    ]
+  }
+  const optionSeedNum: ReactEChartsProps['option'] = {
+    title: {
+      text: 'Number of Seeds'
+    },
+    legend: {
+      right: '10%'
+    },
     tooltip: {
       trigger: 'axis'
     },
@@ -13,123 +87,82 @@ const Stats = () => {
       type: 'category',
       axisLine: {
         onZero: false
-      },
-      axisLabel: {
-        rotate: 45
       }
     },
     yAxis: {
       type: 'value'
-    }
-  }
-  const optionDockingScore: ReactEChartsProps['option'] = {
-    ...optionStatsChart,
-    ...{
-      title: {
-        text: 'Scores'
-      },
-      series: [
-        {
-          data: [
-            ['Gen1', -10.401],
-            ['Gen2', -10.964],
-            ['Gen3', -9.754],
-            ['Gen4', -9.416],
-            ['Gen5', -9.377],
-            ['Gen6', -9.737],
-            ['Gen7', -8.817],
-            ['Gen8', -8.06],
-            ['Gen9', -8.295],
-            ['Gen10', -7.198]
-          ],
-          type: 'line',
-          name: 'Docking Score'
-        },
-        {
-          data: [
-            ['Gen1', -9.0],
-            ['Gen2', -9.0],
-            ['Gen3', -9.0],
-            ['Gen4', -9.0],
-            ['Gen5', -9.73845],
-            ['Gen6', -10.14604],
-            ['Gen7', -10.24604],
-            ['Gen8', -10.54604],
-            ['Gen9', -10.84604],
-            ['Gen10', -11.14604]
-          ],
-          type: 'line',
-          name: 'Score Cutoff'
-        }
-      ]
-    }
-  }
-  const optionSeedNum: ReactEChartsProps['option'] = {
-    ...optionStatsChart,
-    ...{
-      title: {
-        text: 'Number of Seeds'
-      },
-      series: [
-        {
-          data: [
-            ['Gen1', 150],
-            ['Gen2', 230],
-            ['Gen3', 224],
-            ['Gen4', 218],
-            ['Gen5', 135],
-            ['Gen6', 147],
-            ['Gen7', 260],
-            ['Gen8', 165],
-            ['Gen9', 127],
-            ['Gen10', 210]
-          ],
-          type: 'line'
-        }
-      ]
-    }
+    },
+    series: [
+      {
+        data: [
+          ['Gen1', 150],
+          ['Gen2', 230],
+          ['Gen3', 224],
+          ['Gen4', 218],
+          ['Gen5', 135],
+          ['Gen6', 147],
+          ['Gen7', 260],
+          ['Gen8', 165],
+          ['Gen9', 127],
+          ['Gen10', 210]
+        ],
+        type: 'line'
+      }
+    ]
   }
   const optionGenMol: ReactEChartsProps['option'] = {
-    ...optionStatsChart,
-    ...{
-      title: {
-        text: 'Number of Molecules'
+    title: {
+      text: 'Number of Molecules'
+    },
+    legend: {
+      right: '10%'
+    },
+    tooltip: {
+      trigger: 'axis'
+    },
+    xAxis: {
+      type: 'category',
+      axisLine: {
+        onZero: false
+      }
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [
+      {
+        data: [
+          ['Gen1', 150],
+          ['Gen2', 230],
+          ['Gen3', 224],
+          ['Gen4', 218],
+          ['Gen5', 135],
+          ['Gen6', 147],
+          ['Gen7', 260],
+          ['Gen8', 165],
+          ['Gen9', 127],
+          ['Gen10', 210]
+        ],
+        type: 'bar',
+        name: 'Generated'
       },
-      series: [
-        {
-          data: [
-            ['Gen1', 150],
-            ['Gen2', 230],
-            ['Gen3', 224],
-            ['Gen4', 218],
-            ['Gen5', 135],
-            ['Gen6', 147],
-            ['Gen7', 260],
-            ['Gen8', 165],
-            ['Gen9', 127],
-            ['Gen10', 210]
-          ],
-          type: 'bar',
-          name: 'Generated'
-        },
-        {
-          data: [
-            ['Gen1', 110],
-            ['Gen2', 180],
-            ['Gen3', 154],
-            ['Gen4', 178],
-            ['Gen5', 85],
-            ['Gen6', 107],
-            ['Gen7', 200],
-            ['Gen8', 115],
-            ['Gen9', 77],
-            ['Gen10', 176]
-          ],
-          type: 'bar',
-          name: 'Filtered'
-        }
-      ]
-    }
+      {
+        data: [
+          ['Gen1', 110],
+          ['Gen2', 180],
+          ['Gen3', 154],
+          ['Gen4', 178],
+          ['Gen5', 85],
+          ['Gen6', 107],
+          ['Gen7', 200],
+          ['Gen8', 115],
+          ['Gen9', 77],
+          ['Gen10', 176]
+        ],
+        type: 'bar',
+        name: 'Filtered'
+      }
+    ]
   }
 
   return (

@@ -1,3 +1,4 @@
+import re
 from flask import Flask, jsonify, request
 import os
 from datetime import datetime
@@ -11,6 +12,7 @@ from utils.strutil import (
 )
 from utils.config import Config, ConfigError
 import logging
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -394,6 +396,9 @@ def delete_smiles():
 def get_project_status():
     # Get args from request data
     path = request.args.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+
     status = read_status(path)
     if not status:
         return jsonify({"error": "Cannot get project status"}), 400
@@ -404,6 +409,9 @@ def get_project_status():
 def start():
     # Get args from request data
     path = request.json.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+
     statusData = read_status(path)
     if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
@@ -436,6 +444,9 @@ def start():
 def pause():
     # Get args from request data
     path = request.json.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+
     statusData = read_status(path)
     if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
@@ -454,6 +465,9 @@ def pause():
 def resume():
     # Get args from request data
     path = request.json.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+
     statusData = read_status(path)
     if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
@@ -466,6 +480,42 @@ def resume():
     save_status(path, statusData)
     logger.info(f"Resume project {path} successfully")
     return jsonify({"message": "Resume successfully"}), 200
+
+
+@app.route("/secse/get_scores", methods=["Get"])
+def get_scores():
+    # Get args from request data
+    path = request.args.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+
+    status = read_status(path)
+    currentGeneration = status["generation"]["current"]
+    result = {"dockingScore": [], "scoreCutoff": []}
+    # iterate over generations
+    for i in range(1, currentGeneration + 1):
+        # read docking score from docked_gen_[n].csv file
+        docked_file = os.path.join(
+            path, "generation_" + str(i), "docked_gen_" + str(i) + ".csv"
+        )
+        df = pd.read_csv(docked_file)
+        result["dockingScore"].append(df["docking score"].astype(float).quantile(0.01))
+
+    # read score cutoff from log file
+    log_file = os.path.join(path, "nohup.out")
+    cutoff_scores = []
+    with open(log_file, "r") as file:
+        for line in file:
+            match = re.search(r"The evaluate score cutoff is: (-?\d+\.\d+)", line)
+            if match:
+                score = float(match.group(1))
+                cutoff_scores.append(score)
+
+    # only include generation 1 to current generation
+    for i in range(1, currentGeneration + 1):
+        result["scoreCutoff"].append(cutoff_scores[i])
+
+    return jsonify(result), 200
 
 
 if __name__ == "__main__":
