@@ -8,15 +8,10 @@ def get_user_directory():
 
 
 # Save project status in a JSON file
-def save_status(path, status, project_code=None):
+def save_status(path, data):
     status_file = os.path.join(path, "project_status.json")
-    data = {
-        "status": status,
-        "project_code": project_code,
-        "timestamp": datetime.now().isoformat(),
-    }
     with open(status_file, "w") as file:
-        json.dump(data, file, indent=4)
+        json.dump(data, file, indent=2)
 
 
 # Read project status from a JSON file

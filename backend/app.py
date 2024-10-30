@@ -180,7 +180,14 @@ def create_project():
         config.save()
 
         # Write project status file
-        save_status(new_project_path, "Created", project_code)
+        statusData = {
+            "status": "Created",
+            "project_code": project_code,
+            "start_time": "",
+            "update_time": datetime.now().isoformat(),
+            "generation": {"current": 0, "total": 0},
+        }
+        save_status(new_project_path, statusData)
 
         return (
             jsonify(
@@ -397,14 +404,30 @@ def get_project_status():
 def start():
     # Get args from request data
     path = request.json.get("path")
-    status = read_status(path)
-    if not status:
+    statusData = read_status(path)
+    if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
-    if status["status"] != "Created":
+    if statusData["status"] != "Created":
         return jsonify({"error": "Only created project can be started"}), 400
 
+    config_file = os.path.join(path, "config.ini")
+
+    # Retrieve all options
+    try:
+        config = Config(config_file)
+    except ConfigError as e:
+        return jsonify({"error": "Fail to load config file!"}), 400
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"error": str(e)}), 500
+
     # todo start running script
-    save_status(path, "Running", status["project_code"])
+    statusData["status"] = "Running"
+    statusData["generation"]["total"] = config.general.num_gen
+    currentTime = datetime.now().isoformat()
+    statusData["start_time"] = currentTime
+    statusData["update_time"] = currentTime
+    save_status(path, statusData)
     logger.info(f"Start project {path} successfully")
     return jsonify({"message": "Start running successfully"}), 200
 
@@ -413,14 +436,16 @@ def start():
 def pause():
     # Get args from request data
     path = request.json.get("path")
-    status = read_status(path)
-    if not status:
+    statusData = read_status(path)
+    if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
-    if status["status"] != "Running":
+    if statusData["status"] != "Running":
         return jsonify({"error": "Only running project can be started"}), 400
 
-    # todo start running script
-    save_status(path, "Paused", status["project_code"])
+    # todo pause job script
+    statusData["status"] = "Paused"
+    statusData["update_time"] = datetime.now().isoformat()
+    save_status(path, statusData)
     logger.info(f"Pause project {path} successfully")
     return jsonify({"message": "Pause successfully"}), 200
 
@@ -429,14 +454,16 @@ def pause():
 def resume():
     # Get args from request data
     path = request.json.get("path")
-    status = read_status(path)
-    if not status:
+    statusData = read_status(path)
+    if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
-    if status["status"] != "Paused":
+    if statusData["status"] != "Paused":
         return jsonify({"error": "Only paused project can be started"}), 400
 
-    # todo start running script
-    save_status(path, "Running", status["project_code"])
+    # todo resume job script
+    statusData["status"] = "Running"
+    statusData["update_time"] = datetime.now().isoformat()
+    save_status(path, statusData)
     logger.info(f"Resume project {path} successfully")
     return jsonify({"message": "Resume successfully"}), 200
 
