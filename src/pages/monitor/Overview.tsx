@@ -1,51 +1,42 @@
 import { CircularProgress } from '@nextui-org/react'
-import { getProjectStatus } from 'api/pages/monitor'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
 import { getTimeDifference } from 'utils/time'
 
 const Overview = () => {
-  const { path: projectPath } = useProjectStore()
-  const [startTimeISO, setStartTimeISO] = useState('')
+  const {
+    status: projectStatus,
+    startTime: startTimeISO,
+    updateTime: updateTimeISO,
+    currentGeneration,
+    totalGeneration
+  } = useProjectStore()
   const [currentTime, setCurrentTime] = useState<Date>(new Date())
   const [timeDifference, setTimeDifference] = useState<{
     hours: number
     minutes: number
     seconds: number
   }>({ hours: 0, minutes: 0, seconds: 0 })
-  const [currentGeneration, setCurrentGeneration] = useState(0)
-  const [totalGeneration, setTotalGeneration] = useState(0)
 
   useEffect(() => {
-    if (projectPath) {
-      getProjectStatus(projectPath)
-        .then((res) => {
-          setStartTimeISO(res.data.start_time)
-          setCurrentGeneration(res.data.generation.current)
-          setTotalGeneration(res.data.generation.total)
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
-        })
+    if (projectStatus === 'Running') {
+      setTimeDifference(getTimeDifference(new Date(startTimeISO), currentTime))
+    } else {
+      setTimeDifference(
+        getTimeDifference(new Date(startTimeISO), new Date(updateTimeISO))
+      )
     }
-  }, [projectPath])
+  }, [currentTime, projectStatus, startTimeISO, updateTimeISO])
 
   useEffect(() => {
-    setTimeDifference(getTimeDifference(new Date(startTimeISO), currentTime))
-  }, [currentTime, startTimeISO])
+    if (projectStatus === 'Running') {
+      const interval = setInterval(() => {
+        setCurrentTime(new Date())
+      }, 1000)
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [currentTime])
+      return () => clearInterval(interval)
+    }
+  }, [currentTime, projectStatus])
 
   return (
     <div>

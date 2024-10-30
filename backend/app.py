@@ -440,6 +440,27 @@ def start():
     return jsonify({"message": "Start running successfully"}), 200
 
 
+@app.route("/secse/stop", methods=["POST"])
+def stop():
+    # Get args from request data
+    path = request.json.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+
+    statusData = read_status(path)
+    if not statusData:
+        return jsonify({"error": "Cannot get project status"}), 400
+    if statusData["status"] != "Running":
+        return jsonify({"error": "Only running project can be stopped"}), 400
+
+    # todo stop job script
+    statusData["status"] = "Stopped"
+    statusData["update_time"] = datetime.now().isoformat()
+    save_status(path, statusData)
+    logger.info(f"Stop project {path} successfully")
+    return jsonify({"message": "Stop successfully"}), 200
+
+
 @app.route("/secse/pause", methods=["POST"])
 def pause():
     # Get args from request data
@@ -451,7 +472,7 @@ def pause():
     if not statusData:
         return jsonify({"error": "Cannot get project status"}), 400
     if statusData["status"] != "Running":
-        return jsonify({"error": "Only running project can be started"}), 400
+        return jsonify({"error": "Only running project can be paused"}), 400
 
     # todo pause job script
     statusData["status"] = "Paused"

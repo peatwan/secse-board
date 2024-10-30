@@ -21,6 +21,16 @@ export const startProject = (path: string) => {
   })
 }
 
+export const stopProject = (path: string) => {
+  return axios({
+    method: 'post',
+    url: '/secse/stop',
+    data: {
+      path: path
+    }
+  })
+}
+
 export const pauseProject = (path: string) => {
   return axios({
     method: 'post',

@@ -8,12 +8,7 @@ import {
   ModalHeader,
   useDisclosure
 } from '@nextui-org/react'
-import {
-  getProjectStatus,
-  pauseProject,
-  resumeProject,
-  startProject
-} from 'api/pages/monitor'
+import { getProjectStatus, startProject, stopProject } from 'api/pages/monitor'
 import { getDefaultDirectory } from 'api/pages/new'
 import { CancelIcon } from 'assets/icons/CancelIcon'
 import { CheckCircleIcon } from 'assets/icons/CheckCircleIcon'
@@ -27,13 +22,18 @@ import { useProjectStore } from 'utils/store'
 import Overview from './Overview'
 import Stats from './Stats'
 import GenDetails from './GenDetails'
+import { StopCircleIcon } from 'assets/icons/StopCircleIcon'
 
 const Monitor = () => {
   const {
     path: projectPath,
     status: projectStatus,
     setPath: setProjectPath,
-    setStatus: setProjectStatus
+    setStatus: setProjectStatus,
+    setStartTime,
+    setUpdateTime,
+    setCurrentGeneration,
+    setTotalGeneration
   } = useProjectStore()
 
   const [isProjectPathChooseModalOpen, setIsProjectPathChooseModalOpen] =
@@ -48,6 +48,10 @@ const Monitor = () => {
       getProjectStatus(projectPath)
         .then((res) => {
           setProjectStatus(res.data.status)
+          setStartTime(res.data.start_time)
+          setUpdateTime(res.data.update_time)
+          setCurrentGeneration(res.data.generation.current)
+          setTotalGeneration(res.data.generation.total)
         })
         .catch((e) => {
           if (e.status === 400) {
@@ -62,7 +66,32 @@ const Monitor = () => {
         setChoosePath(res.data)
       })
     }
-  }, [projectPath, setProjectStatus])
+  }, [
+    projectPath,
+    setCurrentGeneration,
+    setProjectStatus,
+    setStartTime,
+    setTotalGeneration,
+    setUpdateTime
+  ])
+
+  const getStatus = (projectPath: string) => {
+    getProjectStatus(projectPath)
+      .then((res) => {
+        setProjectStatus(res.data.status)
+        setStartTime(res.data.start_time)
+        setUpdateTime(res.data.update_time)
+        setCurrentGeneration(res.data.generation.current)
+        setTotalGeneration(res.data.generation.total)
+      })
+      .catch((e) => {
+        if (e.status === 400) {
+          toast.error(e.response.data.error)
+        } else {
+          toast.error(e.message)
+        }
+      })
+  }
 
   const handleProjectPathChooseModalClose = () => {
     setIsProjectPathChooseModalOpen(false)
@@ -73,11 +102,7 @@ const Monitor = () => {
   }
 
   const handleClickStatusButton = () => {
-    if (
-      projectStatus === 'Created' ||
-      projectStatus === 'Running' ||
-      projectStatus === 'Paused'
-    ) {
+    if (projectStatus === 'Created' || projectStatus === 'Running') {
       onOpen()
     }
   }
@@ -87,7 +112,7 @@ const Monitor = () => {
       setIsLoading(true)
       startProject(projectPath)
         .then(() => {
-          setProjectStatus('Running')
+          getStatus(projectPath)
         })
         .catch((e) => {
           if (e.status === 400) {
@@ -101,25 +126,9 @@ const Monitor = () => {
         })
     } else if (projectStatus === 'Running') {
       setIsLoading(true)
-      pauseProject(projectPath)
+      stopProject(projectPath)
         .then(() => {
-          setProjectStatus('Paused')
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    } else if (projectStatus === 'Paused') {
-      setIsLoading(true)
-      resumeProject(projectPath)
-        .then(() => {
-          setProjectStatus('Running')
+          getStatus(projectPath)
         })
         .catch((e) => {
           if (e.status === 400) {
@@ -147,10 +156,13 @@ const Monitor = () => {
         return <PlayCircleIcon fill="#fafafa" />
       case 'Running':
         return <PauseCircleIcon fill="#fafafa" />
+      case 'Stopped':
+        return <StopCircleIcon fill="#fafafa" />
       case 'Finished':
         return <CheckCircleIcon fill="#000000" />
       case 'Failed':
         return <ErrorIcon fill="#fafafa" />
+
       default:
         return null
     }
@@ -166,6 +178,7 @@ const Monitor = () => {
         return 'primary'
       case 'Finished':
         return 'success'
+      case 'Stopped':
       case 'Failed':
         return 'danger'
       default:
@@ -183,13 +196,7 @@ const Monitor = () => {
     } else if (projectStatus === 'Running') {
       return (
         <span>
-          <b>pause</b> the running job
-        </span>
-      )
-    } else if (projectStatus === 'Paused') {
-      return (
-        <span>
-          <b>resume</b> the pasued job
+          <b>stop</b> the running job
         </span>
       )
     }
