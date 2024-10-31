@@ -60,3 +60,13 @@ export const getScores = (path: string) => {
     }
   })
 }
+
+export const getSeedsNumber = (path: string) => {
+  return axios<number[]>({
+    method: 'get',
+    url: '/secse/get_seeds_number',
+    params: {
+      path: path
+    }
+  })
+}

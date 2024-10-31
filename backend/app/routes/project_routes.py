@@ -288,7 +288,7 @@ def get_project_status():
     return jsonify(status), 200
 
 
-@bp.route("/secse/get_scores", methods=["Get"])
+@bp.route("/secse/get_scores", methods=["GET"])
 def get_scores():
     # Get args from request data
     path = request.args.get("path")
@@ -321,4 +321,24 @@ def get_scores():
     for i in range(1, currentGeneration + 1):
         result["scoreCutoff"].append(cutoff_scores[i])
 
+    return jsonify(result), 200
+
+
+@bp.route("/secse/get_seeds_number", methods=["GET"])
+def get_seeds_number():
+    # Get args from request data
+    path = request.args.get("path")
+    status = read_status(path)
+    currentGeneration = status["generation"]["current"]
+    result = []
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+    for i in range(1, currentGeneration + 1):
+        # read docking score from docked_gen_[n].csv file
+        seed_fragments_file = os.path.join(
+            path, "generation_" + str(i), "seed_fragments.smi"
+        )
+        with open(seed_fragments_file, "r") as file:
+            num_lines = sum(1 for _ in file)
+            result.append(num_lines - 1)  # not count header line
     return jsonify(result), 200

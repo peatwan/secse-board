@@ -1,4 +1,4 @@
-import { getScores } from 'api/pages/monitor'
+import { getScores, getSeedsNumber } from 'api/pages/monitor'
 import {
   ReactECharts,
   ReactEChartsProps
@@ -11,13 +11,24 @@ const Stats = () => {
   const { path: projectPath } = useProjectStore()
   const [dockingScoreList, setDockingScoreList] = useState<number[]>([])
   const [scoreCutoffList, setScoreCutoffList] = useState<number[]>([])
-
+  const [seedsNumberList, setSeedsNumberList] = useState<number[]>([])
   useEffect(() => {
     if (projectPath) {
       getScores(projectPath)
         .then((res) => {
           setDockingScoreList(res.data.dockingScore)
           setScoreCutoffList(res.data.scoreCutoff)
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+        })
+      getSeedsNumber(projectPath)
+        .then((res) => {
+          setSeedsNumberList(res.data)
         })
         .catch((e) => {
           if (e.status === 400) {
@@ -54,7 +65,6 @@ const Stats = () => {
       axisLine: {
         onZero: false
       },
-
       data: genXAxisLabels(dockingScoreList.length)
     },
     yAxis: {
@@ -73,7 +83,7 @@ const Stats = () => {
       }
     ]
   }
-  const optionSeedNum: ReactEChartsProps['option'] = {
+  const optionSeedsNumber: ReactEChartsProps['option'] = {
     title: {
       text: 'Number of Seeds'
     },
@@ -87,25 +97,15 @@ const Stats = () => {
       type: 'category',
       axisLine: {
         onZero: false
-      }
+      },
+      data: genXAxisLabels(seedsNumberList.length)
     },
     yAxis: {
       type: 'value'
     },
     series: [
       {
-        data: [
-          ['Gen1', 150],
-          ['Gen2', 230],
-          ['Gen3', 224],
-          ['Gen4', 218],
-          ['Gen5', 135],
-          ['Gen6', 147],
-          ['Gen7', 260],
-          ['Gen8', 165],
-          ['Gen9', 127],
-          ['Gen10', 210]
-        ],
+        data: seedsNumberList,
         type: 'line'
       }
     ]
@@ -178,7 +178,7 @@ const Stats = () => {
         </div>
         <div className="sm:col-span-1">
           <div className="h-[300px]">
-            <ReactECharts option={optionSeedNum} />
+            <ReactECharts option={optionSeedsNumber} />
           </div>
         </div>
         <div className="sm:col-span-1">
