@@ -1,4 +1,4 @@
-import { getScores, getSeedsNumber } from 'api/pages/monitor'
+import { getMoleculeNumber, getScores, getSeedsNumber } from 'api/pages/monitor'
 import {
   ReactECharts,
   ReactEChartsProps
@@ -12,6 +12,12 @@ const Stats = () => {
   const [dockingScoreList, setDockingScoreList] = useState<number[]>([])
   const [scoreCutoffList, setScoreCutoffList] = useState<number[]>([])
   const [seedsNumberList, setSeedsNumberList] = useState<number[]>([])
+  const [generatedMoleculeNumberList, setGeneratedMoleculeNumberList] =
+    useState<number[]>([])
+  const [filteredMoleculeNumberList, setFilteredMoleculeNumberList] = useState<
+    number[]
+  >([])
+
   useEffect(() => {
     if (projectPath) {
       getScores(projectPath)
@@ -29,6 +35,18 @@ const Stats = () => {
       getSeedsNumber(projectPath)
         .then((res) => {
           setSeedsNumberList(res.data)
+        })
+        .catch((e) => {
+          if (e.status === 400) {
+            toast.error(e.response.data.error)
+          } else {
+            toast.error(e.message)
+          }
+        })
+      getMoleculeNumber(projectPath)
+        .then((res) => {
+          setGeneratedMoleculeNumberList(res.data.generated)
+          setFilteredMoleculeNumberList(res.data.filtered)
         })
         .catch((e) => {
           if (e.status === 400) {
@@ -110,7 +128,7 @@ const Stats = () => {
       }
     ]
   }
-  const optionGenMol: ReactEChartsProps['option'] = {
+  const optionMoleculeNumber: ReactEChartsProps['option'] = {
     title: {
       text: 'Number of Molecules'
     },
@@ -124,41 +142,20 @@ const Stats = () => {
       type: 'category',
       axisLine: {
         onZero: false
-      }
+      },
+      data: genXAxisLabels(generatedMoleculeNumberList.length)
     },
     yAxis: {
       type: 'value'
     },
     series: [
       {
-        data: [
-          ['Gen1', 150],
-          ['Gen2', 230],
-          ['Gen3', 224],
-          ['Gen4', 218],
-          ['Gen5', 135],
-          ['Gen6', 147],
-          ['Gen7', 260],
-          ['Gen8', 165],
-          ['Gen9', 127],
-          ['Gen10', 210]
-        ],
+        data: generatedMoleculeNumberList,
         type: 'bar',
         name: 'Generated'
       },
       {
-        data: [
-          ['Gen1', 110],
-          ['Gen2', 180],
-          ['Gen3', 154],
-          ['Gen4', 178],
-          ['Gen5', 85],
-          ['Gen6', 107],
-          ['Gen7', 200],
-          ['Gen8', 115],
-          ['Gen9', 77],
-          ['Gen10', 176]
-        ],
+        data: filteredMoleculeNumberList,
         type: 'bar',
         name: 'Filtered'
       }
@@ -183,7 +180,7 @@ const Stats = () => {
         </div>
         <div className="sm:col-span-1">
           <div className="h-[300px]">
-            <ReactECharts option={optionGenMol} />
+            <ReactECharts option={optionMoleculeNumber} />
           </div>
         </div>
       </div>

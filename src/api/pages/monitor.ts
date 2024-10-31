@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ProjectStatus, Scores } from 'types/ProjectStatus'
+import { MoleculeNumber, ProjectStatus, Scores } from 'types/ProjectStatus'
 
 export const getProjectStatus = (path: string) => {
   return axios<ProjectStatus>({
@@ -65,6 +65,15 @@ export const getSeedsNumber = (path: string) => {
   return axios<number[]>({
     method: 'get',
     url: '/secse/get_seeds_number',
+    params: {
+      path: path
+    }
+  })
+}
+export const getMoleculeNumber = (path: string) => {
+  return axios<MoleculeNumber>({
+    method: 'get',
+    url: '/secse/get_molecule_number',
     params: {
       path: path
     }

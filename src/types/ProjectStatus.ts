@@ -12,3 +12,8 @@ export interface Scores {
   dockingScore: number[]
   scoreCutoff: number[]
 }
+
+export interface MoleculeNumber {
+  generated: number[]
+  filtered: number[]
+}

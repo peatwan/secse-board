@@ -334,11 +334,31 @@ def get_seeds_number():
     if not path or not os.path.exists(path) or not os.path.isdir(path):
         return jsonify({"error": "Project path does not exist"}), 400
     for i in range(1, currentGeneration + 1):
-        # read docking score from docked_gen_[n].csv file
         seed_fragments_file = os.path.join(
             path, "generation_" + str(i), "seed_fragments.smi"
         )
         with open(seed_fragments_file, "r") as file:
             num_lines = sum(1 for _ in file)
             result.append(num_lines - 1)  # not count header line
+    return jsonify(result), 200
+
+
+@bp.route("/secse/get_molecule_number", methods=["GET"])
+def get_molecule_number():
+    # Get args from request data
+    path = request.args.get("path")
+    status = read_status(path)
+    currentGeneration = status["generation"]["current"]
+    result = {"generated": [], "filtered": []}
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+    for i in range(1, currentGeneration + 1):
+        filter_file = os.path.join(path, "generation_" + str(i), "filter.csv")
+        with open(filter_file, "r") as file:
+            num_lines = sum(1 for _ in file)
+            result["filtered"].append(num_lines - 1)  # not count header line
+        generation_file = os.path.join(path, "generation_" + str(i), "generation.csv")
+        with open(generation_file, "r") as file:
+            num_lines = sum(1 for _ in file)
+            result["generated"].append(num_lines)
     return jsonify(result), 200
