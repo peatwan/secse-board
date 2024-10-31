@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { MoleculeNumber, ProjectStatus, Scores } from 'types/ProjectStatus'
+import { MoleculeNumber, ProjectStatus, Scores } from 'api/types/monitor'
 
 export const getProjectStatus = (path: string) => {
   return axios<ProjectStatus>({
