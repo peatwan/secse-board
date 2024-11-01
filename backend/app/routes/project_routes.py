@@ -1,6 +1,6 @@
 import re
 import shutil
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 import os
 from datetime import datetime
 
@@ -362,3 +362,64 @@ def get_molecule_number():
             num_lines = sum(1 for _ in file)
             result["generated"].append(num_lines)
     return jsonify(result), 200
+
+
+@bp.route("/secse/get_generation_details", methods=["GET"])
+def get_generation_details():
+    # Get args from request data
+    path = request.args.get("path")
+    generation = request.args.get("generation")
+    file_type = request.args.get("file_type")
+
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Project path does not exist"}), 400
+    if file_type == "generationResult":
+        file = os.path.join(
+            path, "generation_" + generation, "docked_gen_" + generation + ".csv"
+        )
+        df = pd.read_csv(file)
+
+        df.sort_values(by="fitness_rank")
+        df_filtered = (
+            df[["id", "smiles", "docking score", "delta_docking_score", "rmsd"]]
+            .rename(
+                columns={
+                    "docking score": "dockingScore",
+                    "delta_docking_score": "deltaDockingScore",
+                }
+            )
+            .head(100)
+        )
+        return df_filtered.to_json(orient="records"), 200
+    else:
+        return [], 200
+
+
+@bp.route("/secse/get_generation_result_file", methods=["GET"])
+def get_generation_result_file():
+    # Get args from request data
+    path = request.args.get("path")
+    generation = request.args.get("generation")
+    id = request.args.get("id")
+
+    file = os.path.join(path, "generation_" + generation, "sdf_files", id + ".sdf")
+    return send_file(file)
+
+
+@bp.route("/secse/get_target_file", methods=["GET"])
+def get_target_file():
+    # Get args from request data
+    path = request.args.get("path")
+
+    # Retrieve all options
+    config_file = os.path.join(path, "config.ini")
+    try:
+        config = Config(config_file)
+    except ConfigError as e:
+        return jsonify({"error": "Fail to load config file!"}), 400
+    except Exception as e:
+        logger.error(e)
+        return jsonify({"error": str(e)}), 500
+
+    file = config.docking.target
+    return send_file(file)

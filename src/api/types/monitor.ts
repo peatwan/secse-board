@@ -17,3 +17,14 @@ export interface MoleculeNumber {
   generated: number[]
   filtered: number[]
 }
+
+export interface GenerationDetails {
+  id: string
+}
+
+export interface GenerationResult extends GenerationDetails {
+  smiles: string
+  dockingScore: string
+  deltaDockingScore: string
+  rmsd: string
+}

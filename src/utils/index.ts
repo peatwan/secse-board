@@ -48,3 +48,8 @@ export const updateNestedProperty = <
 
   return newObj
 }
+
+export const getSetDifference = <T>(setA: Set<T>, setB: Set<T>): Set<T> => {
+  // Use filter and Array.from to find elements in setA that are not in setB
+  return new Set([...setA].filter((item) => !setB.has(item)))
+}
