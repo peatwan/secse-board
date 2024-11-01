@@ -45,6 +45,7 @@ const GenDetails = () => {
 
   useEffect(() => {
     setGenerationDetailsList([])
+    setSelectedKeys(new Set())
     if (projectPath && generationSelected && fileSelected) {
       setIsTableDataLoading(true)
       getGenerationDetails(projectPath, generationSelected, fileSelected)
@@ -130,6 +131,7 @@ const GenDetails = () => {
               selectionMode="multiple"
               isCompact
               aria-label="Generation Details Table"
+              selectedKeys={selectedKeys}
               onSelectionChange={(keys) => {
                 if (keys === 'all') {
                   const keyArr = generationDetailsList.map((e) => e.id)
