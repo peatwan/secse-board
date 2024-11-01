@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
 
 const Stats = () => {
-  const { path: projectPath } = useProjectStore()
+  const { path: projectPath, status, currentGeneration } = useProjectStore()
   const [dockingScoreList, setDockingScoreList] = useState<number[]>([])
   const [scoreCutoffList, setScoreCutoffList] = useState<number[]>([])
   const [seedsNumberList, setSeedsNumberList] = useState<number[]>([])
@@ -19,7 +19,7 @@ const Stats = () => {
   >([])
 
   useEffect(() => {
-    if (projectPath) {
+    if (projectPath && status && currentGeneration) {
       getScores(projectPath)
         .then((res) => {
           setDockingScoreList(res.data.dockingScore)
@@ -56,7 +56,7 @@ const Stats = () => {
           }
         })
     }
-  }, [projectPath])
+  }, [currentGeneration, projectPath, status])
 
   const genXAxisLabels = (n: number) => {
     const arr = []

@@ -75,6 +75,38 @@ const Monitor = () => {
     setUpdateTime
   ])
 
+  useEffect(() => {
+    if (projectStatus === 'Running') {
+      const interval = setInterval(() => {
+        getProjectStatus(projectPath)
+          .then((res) => {
+            setProjectStatus(res.data.status)
+            setStartTime(res.data.start_time)
+            setUpdateTime(res.data.update_time)
+            setCurrentGeneration(res.data.generation.current)
+            setTotalGeneration(res.data.generation.total)
+          })
+          .catch((e) => {
+            if (e.status === 400) {
+              toast.error(e.response.data.error)
+            } else {
+              toast.error(e.message)
+            }
+          })
+      }, 1000 * 60) //1 minute
+
+      return () => clearInterval(interval)
+    }
+  }, [
+    projectPath,
+    projectStatus,
+    setCurrentGeneration,
+    setProjectStatus,
+    setStartTime,
+    setTotalGeneration,
+    setUpdateTime
+  ])
+
   const getStatus = (projectPath: string) => {
     getProjectStatus(projectPath)
       .then((res) => {
