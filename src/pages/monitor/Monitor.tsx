@@ -222,13 +222,14 @@ const Monitor = () => {
     if (projectStatus === 'Created') {
       return (
         <span>
-          <b>start</b> running
+          Are you sure to <b>start</b> running?
         </span>
       )
     } else if (projectStatus === 'Running') {
       return (
         <span>
-          <b>stop</b> the running job
+          Are you sure to <b>STOP</b> the running job? Stopped job can{' '}
+          <b>NOT</b> be resumed.
         </span>
       )
     }
@@ -303,9 +304,11 @@ const Monitor = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Info</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                {projectStatus === 'Running' ? 'Warning' : 'Info'}
+              </ModalHeader>
               <ModalBody>
-                <p>Are you sure to {getModalText()}?</p>
+                <p>{getModalText()}</p>
               </ModalBody>
               <ModalFooter>
                 <Button color="default" onPress={onClose}>
