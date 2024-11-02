@@ -67,7 +67,7 @@ const Stats = () => {
     return arr
   }
 
-  const optionDockingScore: ReactEChartsProps['option'] = {
+  const optionScores: ReactEChartsProps['option'] = {
     title: {
       text: 'Scores'
     },
@@ -86,7 +86,10 @@ const Stats = () => {
       data: genXAxisLabels(dockingScoreList.length)
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
+      max: Math.ceil(
+        Math.max(Math.max(...dockingScoreList), Math.max(...scoreCutoffList))
+      )
     },
     series: [
       {
@@ -170,7 +173,7 @@ const Stats = () => {
       <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
         <div className="sm:col-span-1">
           <div className="h-[300px]">
-            <ReactECharts option={optionDockingScore} />
+            <ReactECharts option={optionScores} />
           </div>
         </div>
         <div className="sm:col-span-1">
