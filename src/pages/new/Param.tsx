@@ -29,13 +29,9 @@ const Param = () => {
 
   useEffect(() => {
     if (status === 'Created' && path) {
-      getConfig(path)
-        .then((res) => {
-          setAppConfig(res.data)
-        })
-        .catch((e) => {
-          toast.error(e.message)
-        })
+      getConfig(path).then((data) => {
+        setAppConfig(data)
+      })
     }
   }, [path, setAppConfig, status])
 
@@ -45,28 +41,16 @@ const Param = () => {
   }
 
   const handleSave = () => {
-    saveConfig(path, appConfig)
-      .then((res) => {
-        toast.success(res.data.message)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    saveConfig(path, appConfig).then((data) => {
+      toast.success(data.message)
+    })
   }
 
   const handleReset = () => {
     if (status === 'Created' && path) {
-      getConfig(path)
-        .then((res) => {
-          setAppConfig(res.data)
-        })
-        .catch((e) => {
-          toast.error(e.message)
-        })
+      getConfig(path).then((data) => {
+        setAppConfig(data)
+      })
     }
     onClose()
   }

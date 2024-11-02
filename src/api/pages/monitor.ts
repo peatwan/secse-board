@@ -1,15 +1,15 @@
-import axios from 'axios'
 import {
   GenerationDetails,
   MoleculeNumber,
   ProjectStatus,
   Scores
-} from 'api/types/monitor'
+} from 'api/pages/types/monitor'
+import { request } from 'utils/service'
 
 export const getProjectStatus = (path: string) => {
-  return axios<ProjectStatus>({
+  return request<ProjectStatus>({
     method: 'get',
-    url: '/secse/get_project_status',
+    url: '/get_project_status',
     params: {
       path: path
     }
@@ -17,9 +17,9 @@ export const getProjectStatus = (path: string) => {
 }
 
 export const startProject = (path: string) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'post',
-    url: '/secse/start',
+    url: '/start',
     data: {
       path: path
     }
@@ -27,9 +27,9 @@ export const startProject = (path: string) => {
 }
 
 export const stopProject = (path: string) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'post',
-    url: '/secse/stop',
+    url: '/stop',
     data: {
       path: path
     }
@@ -37,9 +37,9 @@ export const stopProject = (path: string) => {
 }
 
 export const pauseProject = (path: string) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'post',
-    url: '/secse/pause',
+    url: '/pause',
     data: {
       path: path
     }
@@ -47,9 +47,9 @@ export const pauseProject = (path: string) => {
 }
 
 export const resumeProject = (path: string) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'post',
-    url: '/secse/resume',
+    url: '/resume',
     data: {
       path: path
     }
@@ -57,9 +57,9 @@ export const resumeProject = (path: string) => {
 }
 
 export const getScores = (path: string) => {
-  return axios<Scores>({
+  return request<Scores>({
     method: 'get',
-    url: '/secse/get_scores',
+    url: '/get_scores',
     params: {
       path: path
     }
@@ -67,18 +67,18 @@ export const getScores = (path: string) => {
 }
 
 export const getSeedsNumber = (path: string) => {
-  return axios<number[]>({
+  return request<number[]>({
     method: 'get',
-    url: '/secse/get_seeds_number',
+    url: '/get_seeds_number',
     params: {
       path: path
     }
   })
 }
 export const getMoleculeNumber = (path: string) => {
-  return axios<MoleculeNumber>({
+  return request<MoleculeNumber>({
     method: 'get',
-    url: '/secse/get_molecule_number',
+    url: '/get_molecule_number',
     params: {
       path: path
     }
@@ -90,9 +90,9 @@ export const getGenerationDetails = (
   generation: string,
   fileType: string
 ) => {
-  return axios<GenerationDetails[]>({
+  return request<GenerationDetails[]>({
     method: 'get',
-    url: '/secse/get_generation_details',
+    url: '/get_generation_details',
     params: {
       path: path,
       generation: generation,
@@ -102,9 +102,9 @@ export const getGenerationDetails = (
 }
 
 export const getTargetFile = (path: string) => {
-  return axios({
+  return request({
     method: 'get',
-    url: '/secse/get_target_file',
+    url: '/get_target_file',
     params: {
       path: path
     }
@@ -116,9 +116,9 @@ export const getGenerationResultFile = (
   generation: string,
   id: string
 ) => {
-  return axios({
+  return request({
     method: 'get',
-    url: '/secse/get_generation_result_file',
+    url: '/get_generation_result_file',
     params: {
       path: path,
       generation: generation,

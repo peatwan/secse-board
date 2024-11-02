@@ -4,7 +4,6 @@ import {
   ReactEChartsProps
 } from 'components/react-echarts/ReactECharts'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
 
 const Stats = () => {
@@ -20,41 +19,17 @@ const Stats = () => {
 
   useEffect(() => {
     if (projectPath && status && currentGeneration) {
-      getScores(projectPath)
-        .then((res) => {
-          setDockingScoreList(res.data.dockingScore)
-          setScoreCutoffList(res.data.scoreCutoff)
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
-        })
-      getSeedsNumber(projectPath)
-        .then((res) => {
-          setSeedsNumberList(res.data)
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
-        })
-      getMoleculeNumber(projectPath)
-        .then((res) => {
-          setGeneratedMoleculeNumberList(res.data.generated)
-          setFilteredMoleculeNumberList(res.data.filtered)
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
-        })
+      getScores(projectPath).then((data) => {
+        setDockingScoreList(data.dockingScore)
+        setScoreCutoffList(data.scoreCutoff)
+      })
+      getSeedsNumber(projectPath).then((data) => {
+        setSeedsNumberList(data)
+      })
+      getMoleculeNumber(projectPath).then((data) => {
+        setGeneratedMoleculeNumberList(data.generated)
+        setFilteredMoleculeNumberList(data.filtered)
+      })
     }
   }, [currentGeneration, projectPath, status])
 

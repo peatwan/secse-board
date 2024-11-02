@@ -17,8 +17,8 @@ const New = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    getDefaultDirectory().then((res) => {
-      const defaultDirectory = res.data
+    getDefaultDirectory().then((data) => {
+      const defaultDirectory = data
       setWorkingDirectory(defaultDirectory)
     })
   }, [])
@@ -32,20 +32,12 @@ const New = () => {
   }
 
   const handleCreateProject = () => {
-    createProject(workingDirectory, projectName)
-      .then((res) => {
-        toast.success(res.data.message)
-        setStatus('Created')
-        setPath(res.data.project_path)
-        navigate('/new/param')
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    createProject(workingDirectory, projectName).then((data) => {
+      toast.success(data.message)
+      setStatus('Created')
+      setPath(data.project_path)
+      navigate('/new/param')
+    })
   }
 
   return (

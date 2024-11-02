@@ -2,8 +2,6 @@ import { forwardRef, Ref, useEffect, useImperativeHandle, useRef } from 'react'
 import * as $3Dmol from '3dmol'
 import { getGenerationResultFile, getTargetFile } from 'api/pages/monitor'
 import { getSetDifference } from 'utils'
-import { toast } from 'sonner'
-import { AxiosResponse } from 'axios'
 
 interface Props {
   path: string
@@ -34,20 +32,12 @@ const Molecule3DViewer = forwardRef<Molecule3DViewerHandle, Props>(
       const config = { backgroundColor: 'white' }
       viewer = $3Dmol.createViewer(element, config)
       if (path) {
-        getTargetFile(path)
-          .then((res) => {
-            targetModal = viewer.addModel(res.data, 'pdb')
-            targetModal.setStyle({ cartoon: { color: 'lightblue' } })
-            viewer.render()
-            viewer.zoomTo()
-          })
-          .catch((e) => {
-            if (e.status === 400) {
-              toast.error(e.response.data.error)
-            } else {
-              toast.error(e.message)
-            }
-          })
+        getTargetFile(path).then((data) => {
+          targetModal = viewer.addModel(data, 'pdb')
+          targetModal.setStyle({ cartoon: { color: 'lightblue' } })
+          viewer.render()
+          viewer.zoomTo()
+        })
       }
     }, [path])
 
@@ -72,26 +62,18 @@ const Molecule3DViewer = forwardRef<Molecule3DViewerHandle, Props>(
       const addedIDArr = Array.from(addedID)
       idSetPrev.current = idSet
       if (addedIDArr.length > 0) {
-        const allPromises: Promise<AxiosResponse<unknown, unknown>>[] = []
+        const allPromises: Promise<unknown>[] = []
         addedIDArr.forEach((id) => {
           allPromises.push(getGenerationResultFile(path, generation, id))
         })
-        Promise.all(allPromises)
-          .then((resArr) => {
-            for (let i = 0; i < resArr.length; ++i) {
-              const modal = viewer.addModel(resArr[i].data, 'sdf')
-              modal.setStyle({ stick: {} })
-              moleculeModalList.push({ id: addedIDArr[i], modal: modal })
-            }
-            viewer.render()
-          })
-          .catch((e) => {
-            if (e.status === 400) {
-              toast.error(e.response.data.error)
-            } else {
-              toast.error(e.message)
-            }
-          })
+        Promise.all(allPromises).then((dataArr) => {
+          for (let i = 0; i < dataArr.length; ++i) {
+            const modal = viewer.addModel(dataArr[i], 'sdf')
+            modal.setStyle({ stick: {} })
+            moleculeModalList.push({ id: addedIDArr[i], modal: modal })
+          }
+          viewer.render()
+        })
       }
     }, [generation, idSet, path])
 

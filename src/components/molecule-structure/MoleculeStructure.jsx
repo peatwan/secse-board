@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import _ from 'lodash'
+import _ from 'lodash-es'
 import PropTypes from 'prop-types'
 import './MoleculeStructure.css'
 import initRDKit from 'utils/initRDKit'

@@ -1,13 +1,14 @@
-import axios from 'axios'
 import { AppConfig } from 'pages/new/types/appConfig'
+import { request } from 'utils/service'
+import { CreateProjectData } from './types/new'
 
 export const createProject = (
   workingDirectory: string,
   projectName: string
 ) => {
-  return axios({
+  return request<CreateProjectData>({
     method: 'post',
-    url: '/secse/create_project',
+    url: '/create_project',
     data: {
       workingDirectory: workingDirectory,
       projectName: projectName
@@ -16,9 +17,9 @@ export const createProject = (
 }
 
 export const getConfig = (directory: string) => {
-  return axios({
+  return request<AppConfig>({
     method: 'get',
-    url: '/secse/get_config',
+    url: '/get_config',
     params: {
       directory: directory
     }
@@ -26,9 +27,9 @@ export const getConfig = (directory: string) => {
 }
 
 export const saveConfig = (directory: string, appConfig: AppConfig) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'post',
-    url: '/secse/save_config',
+    url: '/save_config',
     data: {
       directory: directory,
       config: appConfig
@@ -37,9 +38,9 @@ export const saveConfig = (directory: string, appConfig: AppConfig) => {
 }
 
 export const getDefaultDirectory = () => {
-  return axios<string>({
+  return request<string>({
     method: 'get',
-    url: '/secse/get_default_directory'
+    url: '/get_default_directory'
   })
 }
 
@@ -48,9 +49,9 @@ export const updateSmiles = (
   id: string,
   smiles: string
 ) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'post',
-    url: '/secse/update_smiles',
+    url: '/update_smiles',
     data: {
       smiles_file_path: smilesFilePath,
       id: id,
@@ -60,9 +61,9 @@ export const updateSmiles = (
 }
 
 export const deleteSmiles = (smilesFilePath: string, id: string) => {
-  return axios({
+  return request<ApiResponseMessage>({
     method: 'delete',
-    url: '/secse/delete_smiles',
+    url: '/delete_smiles',
     params: {
       smiles_file_path: smilesFilePath,
       id: id

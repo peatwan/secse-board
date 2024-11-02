@@ -17,7 +17,6 @@ import { PauseCircleIcon } from 'assets/icons/PauseCircileIcon'
 import { PlayCircleIcon } from 'assets/icons/PlayCircleIcon'
 import ChooseModal from 'components/choose-modal/ChooseModal'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
 import Overview from './Overview'
 import Stats from './Stats'
@@ -46,24 +45,19 @@ const Monitor = () => {
     if (projectPath) {
       setChoosePath(projectPath)
       getProjectStatus(projectPath)
-        .then((res) => {
-          setProjectStatus(res.data.status)
-          setStartTime(res.data.start_time)
-          setUpdateTime(res.data.update_time)
-          setCurrentGeneration(res.data.generation.current)
-          setTotalGeneration(res.data.generation.total)
+        .then((data) => {
+          setProjectStatus(data.status)
+          setStartTime(data.start_time)
+          setUpdateTime(data.update_time)
+          setCurrentGeneration(data.generation.current)
+          setTotalGeneration(data.generation.total)
         })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
+        .catch(() => {
           setProjectStatus('NotCreated')
         })
     } else {
-      getDefaultDirectory().then((res) => {
-        setChoosePath(res.data)
+      getDefaultDirectory().then((data) => {
+        setChoosePath(data)
       })
     }
   }, [
@@ -78,21 +72,13 @@ const Monitor = () => {
   useEffect(() => {
     if (projectStatus === 'Running') {
       const interval = setInterval(() => {
-        getProjectStatus(projectPath)
-          .then((res) => {
-            setProjectStatus(res.data.status)
-            setStartTime(res.data.start_time)
-            setUpdateTime(res.data.update_time)
-            setCurrentGeneration(res.data.generation.current)
-            setTotalGeneration(res.data.generation.total)
-          })
-          .catch((e) => {
-            if (e.status === 400) {
-              toast.error(e.response.data.error)
-            } else {
-              toast.error(e.message)
-            }
-          })
+        getProjectStatus(projectPath).then((data) => {
+          setProjectStatus(data.status)
+          setStartTime(data.start_time)
+          setUpdateTime(data.update_time)
+          setCurrentGeneration(data.generation.current)
+          setTotalGeneration(data.generation.total)
+        })
       }, 1000 * 60) //1 minute
 
       return () => clearInterval(interval)
@@ -108,21 +94,13 @@ const Monitor = () => {
   ])
 
   const getStatus = (projectPath: string) => {
-    getProjectStatus(projectPath)
-      .then((res) => {
-        setProjectStatus(res.data.status)
-        setStartTime(res.data.start_time)
-        setUpdateTime(res.data.update_time)
-        setCurrentGeneration(res.data.generation.current)
-        setTotalGeneration(res.data.generation.total)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    getProjectStatus(projectPath).then((data) => {
+      setProjectStatus(data.status)
+      setStartTime(data.start_time)
+      setUpdateTime(data.update_time)
+      setCurrentGeneration(data.generation.current)
+      setTotalGeneration(data.generation.total)
+    })
   }
 
   const handleProjectPathChooseModalClose = () => {
@@ -146,13 +124,6 @@ const Monitor = () => {
         .then(() => {
           getStatus(projectPath)
         })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
-        })
         .finally(() => {
           setIsLoading(false)
         })
@@ -161,13 +132,6 @@ const Monitor = () => {
       stopProject(projectPath)
         .then(() => {
           getStatus(projectPath)
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
         })
         .finally(() => {
           setIsLoading(false)

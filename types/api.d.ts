@@ -1,0 +1,3 @@
+interface ApiResponseMessage {
+  message: string
+}

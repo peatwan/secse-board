@@ -13,13 +13,12 @@ import {
   TableRow
 } from '@nextui-org/react'
 import { getGenerationDetails } from 'api/pages/monitor'
-import { GenerationDetails, GenerationResult } from 'api/types/monitor'
+import { GenerationDetails, GenerationResult } from 'api/pages/types/monitor'
 import Molecule3DViewer, {
   Molecule3DViewerHandle
 } from 'components/molecule-3d-viewer/Molecule3DViewer'
 import MoleculeStructure from 'components/molecule-structure/MoleculeStructure'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'
 
 const generationResultColumns = [
@@ -61,15 +60,8 @@ const GenDetails = () => {
     if (projectPath && generationSelected && fileSelected) {
       setIsTableDataLoading(true)
       getGenerationDetails(projectPath, generationSelected, fileSelected)
-        .then((res) => {
-          setGenerationDetailsList(res.data)
-        })
-        .catch((e) => {
-          if (e.status === 400) {
-            toast.error(e.response.data.error)
-          } else {
-            toast.error(e.message)
-          }
+        .then((data) => {
+          setGenerationDetailsList(data)
         })
         .finally(() => {
           setIsTableDataLoading(false)

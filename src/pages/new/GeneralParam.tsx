@@ -17,15 +17,11 @@ import MoleculeViewer from 'components/molecule-viewer/MoleculeViewer'
 import { deleteSmiles, updateSmiles } from 'api/pages/new'
 import { toast } from 'sonner'
 import { getSmilesFromFile } from 'api/components/molecule-viewer'
+import { Smiles } from 'api/components/types/molecule-viewer'
 
 interface Props {
   general: General
   handleUpdate: <V>(path: AppConfigPaths, value: V) => void
-}
-
-export interface Smiles {
-  id: string
-  smiles: string
 }
 
 export type FragmentsViewModalMode = 'viewer' | 'editor'
@@ -64,17 +60,9 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   }, [smilesList])
 
   const loadSmiles = (smilesFilePath: string) => {
-    getSmilesFromFile(smilesFilePath)
-      .then((res) => {
-        setSmilesList(res.data)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    getSmilesFromFile(smilesFilePath).then((data) => {
+      setSmilesList(data)
+    })
   }
 
   const handleFragmentsFileModalClose = () => {
@@ -92,34 +80,18 @@ const GeneralParam: React.FC<Props> = ({ general, handleUpdate }) => {
   }
 
   const handleSaveEdit = (id: string, smiles: string) => {
-    updateSmiles(general.fragments, id, smiles)
-      .then((res) => {
-        toast.success(res.data.message)
-        setFragmentsViewModalMode('viewer')
-        loadSmiles(general.fragments)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    updateSmiles(general.fragments, id, smiles).then((data) => {
+      toast.success(data.message)
+      setFragmentsViewModalMode('viewer')
+      loadSmiles(general.fragments)
+    })
   }
 
   const handleDeteleMolecule = (id: string) => {
-    deleteSmiles(general.fragments, id)
-      .then((res) => {
-        toast.success(res.data.message)
-        loadSmiles(general.fragments)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    deleteSmiles(general.fragments, id).then((data) => {
+      toast.success(data.message)
+      loadSmiles(general.fragments)
+    })
   }
 
   return (

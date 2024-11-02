@@ -21,6 +21,7 @@ import { createFolder, getDirectoryItems } from 'api/components/choose-modal'
 import { toast } from 'sonner'
 import { formatDistance } from 'date-fns'
 import { filesize } from 'filesize'
+import { Directory } from 'api/components/types/choose-modal'
 
 interface Props {
   currentDirectory: string
@@ -29,13 +30,6 @@ interface Props {
   enableFolderCreation: boolean
   handleClose: () => void
   onSave: (directory: string) => void
-}
-
-interface Directory {
-  name: string
-  type: 'file' | 'folder'
-  size: string
-  lastModified: string
 }
 
 interface NewFolderNameModalProps {
@@ -108,17 +102,9 @@ const ChooseModal: React.FC<Props> = ({
   }
 
   const getItems = (directory: string) => {
-    getDirectoryItems(directory)
-      .then((res) => {
-        setItems(res.data)
-      })
-      .catch((e) => {
-        if (e.status === 400) {
-          toast.error(e.response.data.error)
-        } else {
-          toast.error(e.message)
-        }
-      })
+    getDirectoryItems(directory).then((data) => {
+      setItems(data)
+    })
   }
 
   const returnToParentFolder = () => {
@@ -153,14 +139,10 @@ const ChooseModal: React.FC<Props> = ({
     }, [isFolderNameModalOpen, modal])
 
     const handleSave = () => {
-      createFolder(directory, folderName)
-        .then((res) => {
-          toast.success(res.data.message)
-          getItems(directory)
-        })
-        .catch((err) => {
-          toast.error(err.response.data.error)
-        })
+      createFolder(directory, folderName).then((data) => {
+        toast.success(data.message)
+        getItems(directory)
+      })
       handleClose()
     }
 
