@@ -1,4 +1,4 @@
-import { Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Outlet, RouterProvider, createHashRouter } from 'react-router-dom'
 import { NaviBar } from 'components/navibar/NaviBar'
 import Home from 'pages/home/Home'
 import New from 'pages/new/New'
@@ -28,7 +28,7 @@ function App() {
     </div>
   )
 
-  const router = createBrowserRouter([
+  const router = createHashRouter([
     {
       path: '/',
       element: <Layout />,

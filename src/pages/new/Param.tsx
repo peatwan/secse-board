@@ -77,8 +77,8 @@ const Param = () => {
         <div>
           <div className="py-6">
             <Breadcrumbs>
-              <BreadcrumbItem href="/new">New</BreadcrumbItem>
-              <BreadcrumbItem href="/new/param">Param</BreadcrumbItem>
+              <BreadcrumbItem href="/#/new">New</BreadcrumbItem>
+              <BreadcrumbItem href="/#/new/param">Param</BreadcrumbItem>
             </Breadcrumbs>
           </div>
 
