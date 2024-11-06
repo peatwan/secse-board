@@ -13,6 +13,7 @@ from app.utils.strutil import (
     convert_dict_from_snake_to_camel_case,
 )
 from app.utils.file import get_user_directory, read_status, save_status
+from app.utils.validate import validate_path
 
 bp = Blueprint("project_routes", __name__)
 
@@ -296,30 +297,45 @@ def get_scores():
         return jsonify({"error": "Project path does not exist"}), 400
 
     status = read_status(path)
-    currentGeneration = status["generation"]["current"]
+    currentGeneration = status.get("generation", {}).get("current", 0)
     result = {"dockingScore": [], "scoreCutoff": []}
-    # iterate over generations
-    for i in range(1, currentGeneration + 1):
-        # read docking score from docked_gen_[n].csv file
-        docked_file = os.path.join(
-            path, "generation_" + str(i), "docked_gen_" + str(i) + ".csv"
-        )
-        df = pd.read_csv(docked_file)
-        result["dockingScore"].append(df["docking score"].astype(float).quantile(0.01))
 
-    # read score cutoff from log file
+    # Iterate over generations and collect docking scores
+    for i in range(1, currentGeneration + 1):
+        docked_file = os.path.join(path, f"generation_{i}", f"docked_gen_{i}.csv")
+        if os.path.exists(docked_file):
+            try:
+                df = pd.read_csv(docked_file)
+                docking_score_quantile = (
+                    df["docking score"].astype(float).quantile(0.01)
+                )
+                result["dockingScore"].append(docking_score_quantile)
+            except Exception as e:
+                logger.error(f"Error reading file {docked_file}: {str(e)}")
+                return (
+                    jsonify({"error": f"Error reading file {docked_file}: {str(e)}"}),
+                    500,
+                )
+        else:
+            result["dockingScore"].append(None)  # Or handle missing files as desired
+
+    # Read score cutoffs from log file
     log_file = os.path.join(path, "nohup.out")
     cutoff_scores = []
-    with open(log_file, "r") as file:
-        for line in file:
-            match = re.search(r"The evaluate score cutoff is: (-?\d+\.\d+)", line)
-            if match:
-                score = float(match.group(1))
-                cutoff_scores.append(score)
+    try:
+        with open(log_file, "r") as file:
+            for line in file:
+                match = re.search(r"The evaluate score cutoff is: (-?\d+\.\d+)", line)
+                if match:
+                    cutoff_scores.append(float(match.group(1)))
+    except Exception as e:
+        logger.warning(f"Cannot reading log file {log_file}: {str(e)}")
 
-    # only include generation 1 to current generation
-    for i in range(1, currentGeneration + 1):
-        result["scoreCutoff"].append(cutoff_scores[i])
+    # Only include up to the current generation
+    result["scoreCutoff"] = [
+        cutoff_scores[i] if i < len(cutoff_scores) else None
+        for i in range(currentGeneration)
+    ]
 
     return jsonify(result), 200
 
@@ -328,18 +344,33 @@ def get_scores():
 def get_seeds_number():
     # Get args from request data
     path = request.args.get("path")
+    is_valid, error_response, status_code = validate_path(path)
+    if not is_valid:
+        return error_response, status_code
+
     status = read_status(path)
-    currentGeneration = status["generation"]["current"]
+    currentGeneration = status.get("generation", {}).get("current", 0)
     result = []
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
+
     for i in range(1, currentGeneration + 1):
         seed_fragments_file = os.path.join(
-            path, "generation_" + str(i), "seed_fragments.smi"
+            path, f"generation_{i}", "seed_fragments.smi"
         )
-        with open(seed_fragments_file, "r") as file:
-            num_lines = sum(1 for _ in file)
-            result.append(num_lines - 1)  # not count header line
+        if not os.path.exists(seed_fragments_file):
+            result.append(0)  # Or handle missing files as desired
+            continue
+        try:
+            with open(seed_fragments_file, "r") as file:
+                num_lines = sum(1 for _ in file)
+                result.append(num_lines - 1)  # Exclude header line
+        except Exception as e:
+            return (
+                jsonify(
+                    {"error": f"Failed to read seed file for generation {i}: {str(e)}"}
+                ),
+                500,
+            )
+
     return jsonify(result), 200
 
 
@@ -347,20 +378,54 @@ def get_seeds_number():
 def get_molecule_number():
     # Get args from request data
     path = request.args.get("path")
+    is_valid, error_response, status_code = validate_path(path)
+    if not is_valid:
+        return error_response, status_code
+
     status = read_status(path)
-    currentGeneration = status["generation"]["current"]
+    currentGeneration = status.get("generation", {}).get("current", 0)
     result = {"generated": [], "filtered": []}
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
+
     for i in range(1, currentGeneration + 1):
-        filter_file = os.path.join(path, "generation_" + str(i), "filter.csv")
-        with open(filter_file, "r") as file:
-            num_lines = sum(1 for _ in file)
-            result["filtered"].append(num_lines - 1)  # not count header line
-        generation_file = os.path.join(path, "generation_" + str(i), "generation.csv")
-        with open(generation_file, "r") as file:
-            num_lines = sum(1 for _ in file)
-            result["generated"].append(num_lines)
+        filter_file = os.path.join(path, f"generation_{i}", "filter.csv")
+        generation_file = os.path.join(path, f"generation_{i}", "generation.csv")
+
+        # Read filtered file
+        if os.path.exists(filter_file):
+            try:
+                with open(filter_file, "r") as file:
+                    num_lines = sum(1 for _ in file)
+                    result["filtered"].append(num_lines - 1)  # Exclude header line
+            except Exception as e:
+                return (
+                    jsonify(
+                        {
+                            "error": f"Failed to read filter file for generation {i}: {str(e)}"
+                        }
+                    ),
+                    500,
+                )
+        else:
+            result["filtered"].append(0)
+
+        # Read generated file
+        if os.path.exists(generation_file):
+            try:
+                with open(generation_file, "r") as file:
+                    num_lines = sum(1 for _ in file)
+                    result["generated"].append(num_lines)
+            except Exception as e:
+                return (
+                    jsonify(
+                        {
+                            "error": f"Failed to read generation file for generation {i}: {str(e)}"
+                        }
+                    ),
+                    500,
+                )
+        else:
+            result["generated"].append(0)
+
     return jsonify(result), 200
 
 
@@ -371,17 +436,28 @@ def get_generation_details():
     generation = request.args.get("generation")
     file_type = request.args.get("file_type")
 
-    if not path or not os.path.exists(path) or not os.path.isdir(path):
-        return jsonify({"error": "Project path does not exist"}), 400
-    if file_type == "generationResult":
-        file = os.path.join(
-            path, "generation_" + generation, "docked_gen_" + generation + ".csv"
-        )
-        df = pd.read_csv(file)
+    is_valid, error_response, status_code = validate_path(path)
+    if not is_valid:
+        return error_response, status_code
 
-        df.sort_values(by="fitness_rank")
+    # Validate generation and file_type parameters
+    if not generation or not generation.isdigit():
+        return jsonify({"error": "Invalid generation parameter"}), 400
+
+    if file_type != "generationResult":
+        return jsonify([]), 200  # Only handle "generationResult" type
+
+    file = os.path.join(
+        path, f"generation_{generation}", f"docked_gen_{generation}.csv"
+    )
+    if not os.path.exists(file):
+        return jsonify({"error": "Docking file does not exist"}), 400
+
+    try:
+        df = pd.read_csv(file)
+        df_sorted = df.sort_values(by="fitness_rank")
         df_filtered = (
-            df[["id", "smiles", "docking score", "delta_docking_score", "rmsd"]]
+            df_sorted[["id", "smiles", "docking score", "delta_docking_score", "rmsd"]]
             .rename(
                 columns={
                     "docking score": "dockingScore",
@@ -391,8 +467,8 @@ def get_generation_details():
             .head(100)
         )
         return df_filtered.to_json(orient="records"), 200
-    else:
-        return [], 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to process docking file: {str(e)}"}), 500
 
 
 @bp.route("/secse/get_generation_result_file", methods=["GET"])
@@ -400,26 +476,57 @@ def get_generation_result_file():
     # Get args from request data
     path = request.args.get("path")
     generation = request.args.get("generation")
-    id = request.args.get("id")
+    molecule_id = request.args.get("id")  # Renamed to avoid conflict with `id` built-in
 
-    file = os.path.join(path, "generation_" + generation, "sdf_files", id + ".sdf")
-    return send_file(file)
+    # Validate input parameters
+    is_valid, error_response, status_code = validate_path(path)
+    if not is_valid:
+        return error_response, status_code
+    if not generation or not generation.isdigit():
+        return jsonify({"error": "Invalid generation parameter"}), 400
+    if not molecule_id:
+        return jsonify({"error": "Molecule ID is required"}), 400
+
+    # Build the file path and check if it exists
+    file = os.path.join(
+        path, f"generation_{generation}", "sdf_files", f"{molecule_id}.sdf"
+    )
+    if not os.path.exists(file):
+        return jsonify({"error": "Requested SDF file does not exist"}), 400
+
+    try:
+        return send_file(file, as_attachment=True)
+    except Exception as e:
+        return jsonify({"error": f"Failed to send file: {str(e)}"}), 500
 
 
 @bp.route("/secse/get_target_file", methods=["GET"])
 def get_target_file():
     # Get args from request data
     path = request.args.get("path")
+    if not path or not os.path.exists(path) or not os.path.isdir(path):
+        return jsonify({"error": "Invalid or non-existent path provided"}), 400
 
-    # Retrieve all options
+    # Load config file
     config_file = os.path.join(path, "config.ini")
+    if not os.path.isfile(config_file):
+        return jsonify({"error": "Config file not found"}), 400
+
     try:
         config = Config(config_file)
-    except ConfigError as e:
-        return jsonify({"error": "Fail to load config file!"}), 400
+    except ConfigError:
+        return jsonify({"error": "Failed to load config file"}), 400
     except Exception as e:
-        logger.error(e)
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Unexpected error loading config file: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
 
+    # Retrieve and validate target file path from config
     file = config.docking.target
-    return send_file(file)
+    if not file or not os.path.isfile(file):
+        return jsonify({"error": "Target file not found in the config"}), 400
+
+    try:
+        return send_file(file, as_attachment=True)
+    except Exception as e:
+        logger.error(f"Error sending file: {str(e)}")
+        return jsonify({"error": "Failed to send target file"}), 500

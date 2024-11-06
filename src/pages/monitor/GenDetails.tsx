@@ -54,9 +54,22 @@ const GenDetails = () => {
     molecule3DViewerRef.current?.handleRecenter()
   }
 
+  const projectPathChangedRef = useRef(false)
+
+  useEffect(() => {
+    setGenerationSelected('')
+    projectPathChangedRef.current = true
+  }, [projectPath])
+
   useEffect(() => {
     setGenerationDetailsList([])
     setSelectedKeys(new Set())
+
+    if (projectPathChangedRef.current) {
+      projectPathChangedRef.current = false
+      return
+    }
+
     if (projectPath && generationSelected && fileSelected) {
       setIsTableDataLoading(true)
       getGenerationDetails(projectPath, generationSelected, fileSelected)
