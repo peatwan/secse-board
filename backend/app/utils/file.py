@@ -4,7 +4,9 @@ from datetime import datetime
 
 
 def get_user_directory():
-    return os.path.expanduser("~/Projects/test/")
+    with open("backend_config.json") as f:
+        d = json.load(f)
+        return os.path.expanduser(d.get("default_user_directory", "~/"))
 
 
 # Save project status in a JSON file

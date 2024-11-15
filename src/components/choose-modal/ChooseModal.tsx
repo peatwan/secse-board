@@ -12,9 +12,11 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow
+  TableRow,
+  Spinner,
+  SortDescriptor
 } from '@nextui-org/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ArrowBackIcon } from 'assets/icons/ArrowBackIcon'
 import { CreateNewFolderIcon } from 'assets/icons/CreateNewFolderIcon'
 import { createFolder, getDirectoryItems } from 'api/components/choose-modal'
@@ -66,6 +68,11 @@ const ChooseModal: React.FC<Props> = ({
   const [prevDirectory, setPrevDirectory] = useState(currentDirectory)
   const [items, setItems] = useState<Directory[]>([])
   const [isFolderNameModalOpen, setIsFolderNameModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'name',
+    direction: 'ascending'
+  })
 
   useEffect(() => {
     if (isModalOpen) {
@@ -102,10 +109,34 @@ const ChooseModal: React.FC<Props> = ({
   }
 
   const getItems = (directory: string) => {
-    getDirectoryItems(directory).then((data) => {
-      setItems(data)
-    })
+    setIsLoading(true)
+    getDirectoryItems(directory)
+      .then((data) => {
+        setItems(data)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
+
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a: Directory, b: Directory) => {
+      let first, second
+      if (sortDescriptor.column === 'size') {
+        first = a[sortDescriptor.column]
+        second = b[sortDescriptor.column]
+        first = first === '-' ? 0 : (first as unknown as number)
+        second = second === '-' ? 0 : (second as unknown as number)
+      } else {
+        first = a[sortDescriptor.column as keyof Directory].toLowerCase()
+        second = b[sortDescriptor.column as keyof Directory].toLowerCase()
+      }
+
+      const cmp = first < second ? -1 : first > second ? 1 : 0
+
+      return sortDescriptor.direction === 'descending' ? -cmp : cmp
+    })
+  }, [sortDescriptor, items])
 
   const returnToParentFolder = () => {
     const cleanedPath = directory.endsWith('/')
@@ -233,13 +264,21 @@ const ChooseModal: React.FC<Props> = ({
               setDirectory(newDirectory)
             }
           }}
+          sortDescriptor={sortDescriptor}
+          onSortChange={setSortDescriptor}
         >
           <TableHeader columns={columns}>
             {(column) => (
-              <TableColumn key={column.key}>{column.label}</TableColumn>
+              <TableColumn key={column.key} allowsSorting>
+                {column.label}
+              </TableColumn>
             )}
           </TableHeader>
-          <TableBody items={items}>
+          <TableBody
+            items={sortedItems}
+            isLoading={isLoading}
+            loadingContent={<Spinner />}
+          >
             {(item) => (
               <TableRow key={item.name}>
                 {(columnKey) => (

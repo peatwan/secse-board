@@ -1,10 +1,12 @@
 from datetime import datetime
+import json
 import os
 from flask import Blueprint, jsonify, request
 from loguru import logger
 
 from app.utils.file import read_status, save_status
 from app.utils.config import Config, ConfigError
+from app.utils.cmd import shell_cmd_execute
 
 bp = Blueprint("job_routes", __name__)
 
@@ -28,12 +30,17 @@ def start():
     try:
         config = Config(config_file)
     except ConfigError as e:
+        logger.info("Fail to load config file")
         return jsonify({"error": "Fail to load config file!"}), 400
     except Exception as e:
         logger.error(e)
         return jsonify({"error": str(e)}), 500
 
-    # todo start running script
+    # start running script
+    cmd = [f"./start_secse.sh {str(config_file)}"]
+    shell_cmd_execute(cmd)
+
+    # change status
     statusData["status"] = "Running"
     statusData["generation"]["total"] = config.general.num_gen
     currentTime = datetime.now().isoformat()
@@ -57,7 +64,11 @@ def stop():
     if statusData["status"] != "Running":
         return jsonify({"error": "Only running project can be stopped"}), 400
 
-    # todo stop job script
+    # stop job script
+    cmd = [f"./stop_secse.sh {str(path)}"]
+    shell_cmd_execute(cmd)
+
+    # change status
     statusData["status"] = "Stopped"
     statusData["update_time"] = datetime.now().isoformat()
     save_status(path, statusData)

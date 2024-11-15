@@ -27,30 +27,33 @@ def list_directory():
 
     # Get list of items in the provided directory
     for item in os.listdir(directory):
-        itemPath = os.path.join(directory, item)
-        # Get last modified time
-        lastModifiedTime = os.path.getmtime(itemPath)
-        lastModifiedTimeReadable = datetime.fromtimestamp(lastModifiedTime).isoformat()
+        if not item.startswith("."):  # ignore hidden files
+            itemPath = os.path.join(directory, item)
+            # Get last modified time
+            lastModifiedTime = os.path.getmtime(itemPath)
+            lastModifiedTimeReadable = datetime.fromtimestamp(
+                lastModifiedTime
+            ).isoformat()
 
-        # Check if the item is a file or directory and append relevant info
-        if os.path.isdir(itemPath):
-            itemsInfo.append(
-                {
-                    "name": item,
-                    "type": "folder",
-                    "lastModified": lastModifiedTimeReadable,
-                    "size": "-",  # Size is not applicable for directories
-                }
-            )
-        elif os.path.isfile(itemPath):
-            itemsInfo.append(
-                {
-                    "name": item,
-                    "type": "file",
-                    "lastModified": lastModifiedTimeReadable,
-                    "size": os.path.getsize(itemPath),  # Get size for files
-                }
-            )
+            # Check if the item is a file or directory and append relevant info
+            if os.path.isdir(itemPath):
+                itemsInfo.append(
+                    {
+                        "name": item,
+                        "type": "folder",
+                        "lastModified": lastModifiedTimeReadable,
+                        "size": "-",  # Size is not applicable for directories
+                    }
+                )
+            elif os.path.isfile(itemPath):
+                itemsInfo.append(
+                    {
+                        "name": item,
+                        "type": "file",
+                        "lastModified": lastModifiedTimeReadable,
+                        "size": os.path.getsize(itemPath),  # Get size for files
+                    }
+                )
 
     return jsonify(itemsInfo), 200
 
