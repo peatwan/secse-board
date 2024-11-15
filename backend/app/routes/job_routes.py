@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import os
 from flask import Blueprint, jsonify, request
@@ -43,7 +43,7 @@ def start():
     # change status
     statusData["status"] = "Running"
     statusData["generation"]["total"] = config.general.num_gen
-    currentTime = datetime.now().isoformat()
+    currentTime = datetime.now(timezone.utc).isoformat()
     statusData["start_time"] = currentTime
     statusData["update_time"] = currentTime
     save_status(path, statusData)
@@ -70,7 +70,7 @@ def stop():
 
     # change status
     statusData["status"] = "Stopped"
-    statusData["update_time"] = datetime.now().isoformat()
+    statusData["update_time"] = datetime.now(timezone.utc).isoformat()
     save_status(path, statusData)
     logger.info(f"Stop project {path} successfully")
     return jsonify({"message": "Stop successfully"}), 200
@@ -91,7 +91,7 @@ def pause():
 
     # todo pause job script
     statusData["status"] = "Paused"
-    statusData["update_time"] = datetime.now().isoformat()
+    statusData["update_time"] = datetime.now(timezone.utc).isoformat()
     save_status(path, statusData)
     logger.info(f"Pause project {path} successfully")
     return jsonify({"message": "Pause successfully"}), 200
@@ -112,7 +112,7 @@ def resume():
 
     # todo resume job script
     statusData["status"] = "Running"
-    statusData["update_time"] = datetime.now().isoformat()
+    statusData["update_time"] = datetime.now(timezone.utc).isoformat()
     save_status(path, statusData)
     logger.info(f"Resume project {path} successfully")
     return jsonify({"message": "Resume successfully"}), 200

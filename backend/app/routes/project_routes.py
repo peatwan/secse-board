@@ -2,7 +2,7 @@ import re
 import shutil
 from flask import Blueprint, jsonify, request, send_file
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 from loguru import logger
 import pandas as pd
@@ -76,7 +76,7 @@ def create_project():
             "status": "Created",
             "project_code": project_code,
             "start_time": "",
-            "update_time": datetime.now().isoformat(),
+            "update_time": datetime.now(timezone.utc).isoformat(),
             "generation": {"current": 0, "total": 0},
         }
         save_status(new_project_path, statusData)
@@ -298,6 +298,7 @@ def get_scores():
 
     status = read_status(path)
     currentGeneration = status.get("generation", {}).get("current", 0)
+    project_code = status.get("project_code", "")
     result = {"dockingScore": [], "scoreCutoff": []}
 
     # Iterate over generations and collect docking scores
@@ -320,7 +321,7 @@ def get_scores():
             result["dockingScore"].append(None)  # Or handle missing files as desired
 
     # Read score cutoffs from log file
-    log_file = os.path.join(path, "nohup.out")
+    log_file = os.path.join(path, f"{project_code}.log")
     cutoff_scores = []
     try:
         with open(log_file, "r") as file:
