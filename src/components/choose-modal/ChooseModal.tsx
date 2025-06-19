@@ -15,7 +15,7 @@ import {
   TableRow,
   Spinner,
   SortDescriptor
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ArrowBackIcon } from 'assets/icons/ArrowBackIcon'
 import { CreateNewFolderIcon } from 'assets/icons/CreateNewFolderIcon'

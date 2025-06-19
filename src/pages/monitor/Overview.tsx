@@ -1,4 +1,4 @@
-import { CircularProgress } from '@nextui-org/react'
+import { CircularProgress } from '@heroui/react'
 import { useEffect, useState } from 'react'
 import { useProjectStore } from 'utils/store'
 import { getTimeDifference } from 'utils/time'

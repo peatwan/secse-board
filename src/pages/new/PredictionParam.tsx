@@ -1,4 +1,4 @@
-import { Input, Select, SelectItem } from '@nextui-org/react'
+import { Input, Select, SelectItem } from '@heroui/react'
 import { Prediction, PredictionMode } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
 

@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import 'tailwindcss/tailwind.css'
 import App from 'App'
-import { NextUIProvider } from '@nextui-org/react'
+import { HeroUIProvider } from '@heroui/react'
 import { RDKitModule } from '@rdkit/rdkit'
 import React from 'react'
 
@@ -16,8 +16,8 @@ declare global {
 
 root.render(
   <React.StrictMode>
-    <NextUIProvider>
+    <HeroUIProvider>
       <App />
-    </NextUIProvider>
+    </HeroUIProvider>
   </React.StrictMode>
 )

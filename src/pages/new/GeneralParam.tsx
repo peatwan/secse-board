@@ -7,7 +7,7 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { General } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
 import { useEffect, useMemo, useState } from 'react'

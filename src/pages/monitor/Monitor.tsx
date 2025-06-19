@@ -7,7 +7,7 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { getProjectStatus, startProject, stopProject } from 'api/pages/monitor'
 import { getDefaultDirectory } from 'api/pages/new'
 import { CancelIcon } from 'assets/icons/CancelIcon'

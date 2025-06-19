@@ -11,7 +11,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { getGenerationDetails } from 'api/pages/monitor'
 import { GenerationDetails, GenerationResult } from 'api/pages/types/monitor'
 import Molecule3DViewer, {

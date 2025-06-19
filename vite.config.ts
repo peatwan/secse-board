@@ -33,7 +33,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
           manualChunks: {
             // Customize chunking strategy by defining separate chunks for dependencies
             react: ['react', 'react-dom', 'react-router-dom'],
-            nextui: ['@nextui-org/react'],
+            heroui: ['@heroui/react'],
             $3dmol: ['3dmol'],
             echarts: ['echarts']
           }

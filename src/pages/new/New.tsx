@@ -1,4 +1,4 @@
-import { Button, Input } from '@nextui-org/react'
+import { Button, Input } from '@heroui/react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useProjectStore } from 'utils/store'

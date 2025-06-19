@@ -4,7 +4,7 @@ import {
   NavbarContent,
   NavbarItem,
   Button
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { useLocation } from 'react-router-dom'
 import { AcmeLogo } from './AcmeLogo.jsx'
 import { Link } from 'react-router-dom'

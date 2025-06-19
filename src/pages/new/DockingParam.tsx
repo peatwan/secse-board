@@ -1,4 +1,4 @@
-import { Button, Input, Select, SelectItem } from '@nextui-org/react'
+import { Button, Input, Select, SelectItem } from '@heroui/react'
 import SmoothCollapse from 'react-smooth-collapse'
 import { Docking } from './types/appConfig'
 import { AppConfigPaths } from './types/path'

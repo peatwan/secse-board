@@ -1,4 +1,4 @@
-import { Input, Tooltip } from '@nextui-org/react'
+import { Input, Tooltip } from '@heroui/react'
 import { Properties } from './types/appConfig'
 import { AppConfigPaths } from './types/path'
 import SmoothCollapse from 'react-smooth-collapse'

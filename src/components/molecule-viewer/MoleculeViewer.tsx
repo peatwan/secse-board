@@ -13,7 +13,7 @@ import {
   TableRow,
   Tooltip,
   useDisclosure
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { Smiles } from 'api/components/types/molecule-viewer'
 import { DeleteIcon } from 'assets/icons/DeleteIcon'
 import { EditIcon } from 'assets/icons/EditIcon'

@@ -8,7 +8,7 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure
-} from '@nextui-org/react'
+} from '@heroui/react'
 import GeneralParam from './GeneralParam'
 import DockingParam from './DockingParam'
 import PropertiesParam from './PropertiesParam'

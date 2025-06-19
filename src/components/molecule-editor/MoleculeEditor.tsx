@@ -8,7 +8,7 @@ import {
   ModalHeader,
   Tooltip,
   useDisclosure
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { ArrowBackIcon } from 'assets/icons/ArrowBackIcon'
 import { SaveIcon } from 'assets/icons/SaveIcon'
 import { FragmentsViewModalMode } from 'pages/new/GeneralParam'
