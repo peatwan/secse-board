@@ -28,7 +28,7 @@ The application consists of a React frontend built with TypeScript and a Flask b
 - React with TypeScript
 - Vite for build tooling
 - React Router for navigation
-- NextUI and Tailwind CSS for UI components
+- HeroUI and Tailwind CSS for UI components
 - ECharts for data visualization
 - 3DMol and RDKit for molecular visualization
 

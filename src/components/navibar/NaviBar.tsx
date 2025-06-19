@@ -1,13 +1,9 @@
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  Button
-} from '@heroui/react'
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@heroui/react'
 import { useLocation } from 'react-router-dom'
 import { AcmeLogo } from './AcmeLogo.jsx'
 import { Link } from 'react-router-dom'
+import { Link as HLink } from '@heroui/link'
+import { GithubIcon } from 'assets/icons/GithubIcon.js'
 export const NaviBar = () => {
   const location = useLocation()
   return (
@@ -32,11 +28,18 @@ export const NaviBar = () => {
           <Link to="/edit">Edit</Link>
         </NavbarItem> */}
       </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
-            Login
-          </Button>
+      <NavbarContent
+        className="hidden basis-1/5 sm:flex sm:basis-full"
+        justify="end"
+      >
+        <NavbarItem className="hidden gap-2 sm:flex">
+          <HLink
+            isExternal
+            href="https://github.com/peatwan/secse-board"
+            title="GitHub"
+          >
+            <GithubIcon className="text-default-500" />
+          </HLink>
         </NavbarItem>
       </NavbarContent>
     </Navbar>
