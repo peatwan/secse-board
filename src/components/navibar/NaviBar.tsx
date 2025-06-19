@@ -27,9 +27,10 @@ export const NaviBar = () => {
         <NavbarItem isActive={location.pathname === '/monitor'}>
           <Link to="/monitor">Monitor</Link>
         </NavbarItem>
-        <NavbarItem isActive={location.pathname === '/edit'}>
+        {/* todo: edit page */}
+        {/* <NavbarItem isActive={location.pathname === '/edit'}>
           <Link to="/edit">Edit</Link>
-        </NavbarItem>
+        </NavbarItem> */}
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
